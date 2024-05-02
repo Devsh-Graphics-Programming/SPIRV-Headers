@@ -1,0 +1,55 @@
+{
+    "operand": [
+        {
+            "class": "Atomic",
+            "operandList": [
+                "*"
+            ]
+        },
+        {
+            "class": "Conversion",
+            "operandList": [
+                "OpBitcast"
+            ]
+        },
+        {
+            "class": "Bit",
+            "operandList": [
+                "OpBitFieldUExtract",
+                "OpBitFieldSExtract"
+            ]
+        }
+    ],
+    "builtins": [
+        {
+            "name": "HelperInvocation",
+            "type": "bool"
+        },
+        {
+            "name": "Position",
+            "type": "float32_t4",
+            "const": false
+        },
+        {
+            "name": "VertexIndex"
+        },
+        {
+            "name": "InstanceIndex"
+        },
+        {
+            "name": "NumWorkgroups"
+        },
+        {
+            "name": "WorkgroupId"
+        },
+        {
+            "name": "LocalInvocationId"
+        },
+        {
+            "name": "GlobalInvocationId"
+        },
+        {
+            "name": "LocalInvocationIndex"
+        }
+    ]
+}
