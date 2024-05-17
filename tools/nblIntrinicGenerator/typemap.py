@@ -1,4 +1,82 @@
 from typing import Optional
+import re
+
+RESERVED_CPP_KEYWORDS = [
+    "asm",
+    "else",
+    "new",
+    "this",
+    "auto",
+    "enum",
+    "operator",
+    "throw",
+    "bool",
+    "explicit",
+    "private",
+    "true",
+    "break",
+    "export",
+    "protected",
+    "try",
+    "case",
+    "extern",
+    "public",
+    "typedef",
+    "catch",
+    "false",
+    "register",
+    "typeid",
+    "char",
+    "float",
+    "reinterpret_cast",
+    "typename",
+    "class",
+    "for",
+    "return",
+    "union",
+    "const",
+    "friend",
+    "short",
+    "unsigned",
+    "constexpr",
+    "goto",
+    "signed",
+    "using",
+    "continue",
+    "if",
+    "sizeof",
+    "virtual",
+    "default",
+    "inline",
+    "static",
+    "void",
+    "delete",
+    "int",
+    "static_cast",
+    "volatile",
+    "do",
+    "long",
+    "struct",
+    "wchar_t",
+    "double",
+    "mutable",
+    "switch",
+    "while",
+    "dynamic_cast",
+    "namespace",
+    "template",
+    "and",
+    "bitor",
+    "not_eq",
+    "xor",
+    "and_eq",
+    "compl",
+    "or",
+    "xor_eq",
+    "bitand",
+    "not",
+    "or_eq",
+]
 
 
 def stripName(name: Optional[str]):
@@ -9,7 +87,14 @@ def stripName(name: Optional[str]):
     """
     if name is not None:
         name = name.strip(", \"'\t\n(){}[]").replace("_", "").replace("-", "_")
+        if name in RESERVED_CPP_KEYWORDS:
+            name = "_" + name
     return name
+
+
+# find template typenames using regex
+# from strings like "[[ns::something_ext_blah_blah<W,uint32_t>]] const ptr_T&" -> "W"
+REGEX_FIND_TEMPLATE = re.compile("((?<![\w\d_])[A-Z])(?![\w\d_])")
 
 
 class OperandTypeInfo:
@@ -29,6 +114,11 @@ class OperandTypeInfo:
         self.const: bool = entry_dict.get('const', False)
         self.isParam: bool = 'name' in entry_dict.keys()
         self.attributes: list = entry_dict.get('attributes', [])
+
+    def extract_type_info(self, type_string: str):
+
+    def get_typename(self):
+        pass
 
 
 class InstructionTypeMap:
