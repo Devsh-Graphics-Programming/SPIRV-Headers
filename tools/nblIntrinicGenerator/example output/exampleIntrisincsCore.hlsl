@@ -24,17 +24,15 @@ namespace spirv
 {
 // Built-ins
 
-[[vk::ext_builtin_input(spv::BuiltInHelperInvocation)]]
-static const bool HelperInvocation;
-
+// Capabilities:
+// Shader
 [[vk::ext_builtin_input(spv::BuiltInPosition)]]
 static float32_t4 Position;
 
-[[vk::ext_builtin_input(spv::BuiltInVertexIndex)]]
-static const uint32_t VertexIndex;
-
-[[vk::ext_builtin_input(spv::BuiltInInstanceIndex)]]
-static const uint32_t InstanceIndex;
+// Capabilities:
+// Shader
+[[vk::ext_builtin_input(spv::BuiltInHelperInvocation)]]
+static const uint32_t HelperInvocation;
 
 [[vk::ext_builtin_input(spv::BuiltInNumWorkgroups)]]
 static const uint32_t NumWorkgroups;
@@ -51,128 +49,33 @@ static const uint32_t GlobalInvocationId;
 [[vk::ext_builtin_input(spv::BuiltInLocalInvocationIndex)]]
 static const uint32_t LocalInvocationIndex;
 
+// Capabilities:
+// Shader
+[[vk::ext_builtin_input(spv::BuiltInVertexIndex)]]
+static const uint32_t VertexIndex;
+
+// Capabilities:
+// Shader
+[[vk::ext_builtin_input(spv::BuiltInInstanceIndex)]]
+static const uint32_t InstanceIndex;
 
 
-// Class 'Atomic'
-// OpAtomicLoad
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicLoad)]]
-T AtomicLoad([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics);
 
-// OpAtomicStore
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicStore)]]
-void AtomicStore([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicExchange
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicExchange)]]
-T AtomicExchange([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicCompareExchange
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicCompareExchange)]]
-T AtomicCompareExchange([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t equal, uint32_t unequal, T value, T comparator);
-
-// OpAtomicCompareExchangeWeak
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicCompareExchangeWeak)]]
-T AtomicCompareExchangeWeak([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t equal, uint32_t unequal, T value, T comparator);
-
-// OpAtomicIIncrement
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicIIncrement)]]
-T AtomicIIncrement([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics);
-
-// OpAtomicIDecrement
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicIDecrement)]]
-T AtomicIDecrement([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics);
-
-// OpAtomicIAdd
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicIAdd)]]
-T AtomicIAdd([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicISub
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicISub)]]
-T AtomicISub([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicSMin
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicSMin)]]
-T AtomicSMin([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicUMin
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicUMin)]]
-T AtomicUMin([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicSMax
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicSMax)]]
-T AtomicSMax([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicUMax
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicUMax)]]
-T AtomicUMax([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicAnd
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicAnd)]]
-T AtomicAnd([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicOr
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicOr)]]
-T AtomicOr([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicXor
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicXor)]]
-T AtomicXor([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicFlagTestAndSet
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicFlagTestAndSet)]]
-T AtomicFlagTestAndSet([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics);
-
-// OpAtomicFlagClear
-template<typename P>
-[[vk::ext_instruction(spv::OpAtomicFlagClear)]]
-void AtomicFlagClear([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics);
-
-// OpAtomicFMinEXT
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-T AtomicFMinEXT([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicFMaxEXT
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-T AtomicFMaxEXT([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// OpAtomicFAddEXT
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-T AtomicFAddEXT([[vk::ext_reference]] P pointer, uint32_t memory, uint32_t semantics, T value);
-
-// Class 'Conversion'
-// OpBitcast
-template<typename T, typename U>
-[[vk::ext_instruction(spv::OpBitcast)]]
-T Bitcast(U operand);
+// Class 'Non-Uniform'
+// OpGroupNonUniformFAdd
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+uint32_t GroupNonUniformFAdd(uint32_t Execution, uint32_t Operation, uint32_t Value);
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+uint32_t GroupNonUniformFAdd(uint32_t Execution, uint32_t Operation, uint32_t Value, uint32_t ClusterSize);
 
 // Class 'Bit'
 // OpBitFieldSExtract
 [[vk::ext_instruction(spv::OpBitFieldSExtract)]]
-uint32_t BitFieldSExtract(uint32_t base, uint32_t offset, uint32_t count);
+uint32_t BitFieldSExtract(uint32_t Base, uint32_t Offset, uint32_t Count);
 
 // OpBitFieldUExtract
 [[vk::ext_instruction(spv::OpBitFieldUExtract)]]
-uint32_t BitFieldUExtract(uint32_t base, uint32_t offset, uint32_t count);
+uint32_t BitFieldUExtract(uint32_t Base, uint32_t Offset, uint32_t Count);
 
 
 

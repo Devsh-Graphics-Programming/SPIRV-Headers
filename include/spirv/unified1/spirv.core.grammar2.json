@@ -2696,7 +2696,7 @@
       "operands": [
         {
           "kind": "IdResultType",
-          "hlsl_type": "uint32_t"
+          "hlsl_type": "T"
         },
         {
           "kind": "IdResult"
@@ -2704,7 +2704,7 @@
         {
           "kind": "IdRef",
           "name": "'Operand'",
-          "hlsl_type": "uint32_t"
+          "hlsl_type": "U"
         }
       ],
       "version": "1.0"

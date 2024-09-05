@@ -1,14 +1,24 @@
-from typemap import TypeMapHandler
+from typemap import Instruction, Operand
 
 
 class HLSLCodeGenerator:
 
-    def __init__(self, typemapDict: dict, grammar: dict, outputFilepath: str, verbose=False) -> None:
+    def __init__(self, grammar: dict, outputFilepath: str, verbose=False, builtin_print_capabilities_as_comments=False, variants_enabled=True,  optionals_mode="allperms") -> None:
+        """
+        optionals_mode: allperms|incremental|disabled
+            allperms - prints all possible permutations of optional arg combinations, 2^n overloads where n=optional param count
+            incremental - prints n permutations, each overload having one more param than previous
+            disabled - doesnt print any optional arguments
+        """
         self.verbose = verbose
         self.grammar = grammar
-        self.typemap = TypeMapHandler(grammar, typemapDict, verbose)
         self.outFilepath = outputFilepath
         self.out = open(outputFilepath, "w")
+        self.builtin_print_capabilities_as_comments = builtin_print_capabilities_as_comments
+        self.optionals_mode = optionals_mode
+        self.variants_enabled = variants_enabled
+        if self.verbose and self.builtin_print_capabilities_as_comments:
+            print("Capabilities will be attached as comments above builtins as builtin_print_capabilities_as_comments option is enabled")
 
     def GetHeaderGuard(self) -> str:
         """
@@ -91,63 +101,132 @@ namespace spirv
         self.out.write(footer)
 
     def WriteBuiltin(self, input: dict):
-
+        """
+            input: dict, item from grammar that has the following fields
+                "enumerant": the name we are looking for,
+                "value": int,
+                "hlsl_type": string type, 
+                "capabilities": optional array [
+                    "Shader" etc
+                ],
+                "version": "1.0", optional
+        """
         # validate input
-        if not "name" in input.keys():
-            raise ValueError("No 'name' field in builtin, check input json file.")
+        if not "hlsl_type" in input.keys():
+            raise ValueError("No 'hlsl_type' field in builtin, check grammar file.")
 
-        variableName: str = input['name']
+        variableName: str = input['enumerant']
         builtinName = "BuiltIn"+variableName
-        isConst = input.get('const', True)
-        typeName = input.get('type', self.typemap.defaultType)
+        hlsltype = input['hlsl_type']
         if self.verbose:
-            print(f"\tWriting built-in variable: name of built-in var: {builtinName}, name of var: {variableName}, is const: {isConst}, type: {typeName}")
-        # potentially look up the 'variableName' in grammar['operand_kinds'] and check if field ['enumerant'] matches, then print capablities as comments
+            print(f"\tWriting built-in variable: name of built-in var: {builtinName}, name of var: {variableName}, type: {hlsltype}")
+        if self.builtin_print_capabilities_as_comments and 'capabilities' in input.keys() and len(input['capabilities']) > 0:
+            self.out.write("// Capabilities:\n")
+            for capability in input['capabilities']:
+                self.out.write(f"// {capability}\n")
         self.out.write(f"[[vk::ext_builtin_input(spv::{builtinName})]]\n")
-        self.out.write(f"static {'const ' if isConst else ''}{typeName} {variableName};\n")
+        self.out.write(f"{hlsltype} {variableName};\n")
 
     def WriteBuiltins(self, input: dict):
-        listOfBuiltinsToExpose = input.get('builtins', [])
+        whitelistedBuiltins = input.get('builtins', [])  # list of strings
+
+        builtin_grammar_dict = next(filter(lambda opk: opk["category"] == "ValueEnum" and opk["kind"] == "BuiltIn", self.grammar['operand_kinds']))['enumerants']
+        write_all_builtins = False
+        if len(whitelistedBuiltins) == 1 and whitelistedBuiltins[0] == "*":
+            write_all_builtins = True
+            if self.verbose:
+                print(f"Whitelisted all builtins. Exposing all builtins to HLSL that are listed in grammar file")
+
         if self.verbose:
-            print(f"Beginning to write {len(listOfBuiltinsToExpose)} builtins")
-        if len(listOfBuiltinsToExpose) > 0:
+            print(f"Beginning to write builtins")
+
+        if len(whitelistedBuiltins) > 0:
             self.out.write("// Built-ins\n\n")
 
-        for builtinInfo in listOfBuiltinsToExpose:
-            self.WriteBuiltin(builtinInfo)
-            self.out.write('\n')
+        for builtinInfo in builtin_grammar_dict:
+            # check whitelist status for current builtin
+            if not "enumerant" in builtinInfo.keys():
+                raise ValueError("No 'enumerant' field in builtin, check grammar file.")
+
+            if write_all_builtins or builtinInfo['enumerant'] in whitelistedBuiltins:
+                self.WriteBuiltin(builtinInfo)
+                self.out.write('\n')
 
     def WriteInstruction(self, instruction: dict):
         """
         Generates code for a single spirv instruction and writes it to file output
-        """
-        opname: str = instruction['opname']
-        if self.verbose:
-            print(f"\t\tWriting instruction '{opname}'")
-        toWrite = f'// {opname}\n'
-        templateParams = self.typemap.GetGenericTypeList(instruction)
-        if len(templateParams) > 0:
-            templateDecl = f"template<{', '.join('typename '+ t for t in templateParams)}>\n"
-            toWrite += templateDecl
-        attributeDecl = f"[[vk::ext_instruction(spv::{opname})]]\n"
-        toWrite += attributeDecl
-        if any(op['kind'] == 'IdResult' for op in instruction['operands']):
-            returnTypeMapping = self.typemap.GetReturnTypeMapping(opname)
-            if returnTypeMapping is None:
-                if self.verbose:
-                    print(f"\t\t\tReturn type mapping is None for '{opname}', falling back to using default type")
-                toWrite += self.typemap.defaultType
 
-            else:
-                if returnTypeMapping.const:
-                    toWrite += "const "
-                toWrite += returnTypeMapping.typeName
-        else:
-            toWrite += "void"
+        The generated code can produce several overloads of the same function in hlsl
+        if the following occur:
+        you have optional parameters (that have name, hlsl_type, kind and quantifier in grammar file)
+        you have hlsl_type overloads
+        """
+        instr = Instruction(instruction)
+        opname = instr.opname
+        if self.verbose:
+            print(f"\t\tWriting instruction '{opname}' that has {instr.variant_count} overloads")
+
+        self.out.write(f'// {opname}\n')
+
         functionName = opname[2:] if opname.startswith("Op") else opname
-        params = self.typemap.GetFunctionParameters(instruction)
-        toWrite += f" {functionName}({', '.join(params)});\n"
-        self.out.write(toWrite)
+        attribute = (f"[[vk::ext_instruction(spv::{opname})]]")
+
+        for variant_idx in range(instr.variant_count):
+            ret_type, func_params = instr.variant_list[variant_idx]
+
+            if ret_type is None:
+                ret_typename = ('void')
+            else:
+                ret_typename = (ret_type.typename)
+
+            def _WriteInstr(params):
+                generics = list()  # retains order
+                genericSet = set()  # faster lookup for contains
+                if ret_type is not None:
+                    if ret_type.is_generic:
+                        for genericT in ret_type.generic_types:
+                            generics.append(genericT)
+                            genericSet.add(genericT)
+                for p in params:
+                    if p.is_generic:
+                        for genericT in p.generic_types:
+                            if genericT not in genericSet:
+                                generics.append(genericT)
+                                genericSet.add(genericT)
+                if len(generics) > 0:
+                    # template declaration
+                    self.out.write(f"template<{', '.join('typename '+ t for t in generics)}>\n")
+                self.out.write(f"{attribute}\n{ret_typename} {functionName}({', '.join([x.get_param_str() for x in params])});\n")
+
+            if self.optionals_mode == "allperms":
+                optional_operands = list(filter(lambda x: x.is_optional, func_params))
+                optional_operand_count = len(optional_operands)
+                optional_operand_permutations = 2 ** optional_operand_count
+                for bitflag in range(optional_operand_permutations):
+                    # bitflag, if 1 on nth position then expose nth optional , if 0 skip
+                    fp = []
+                    pos = 0
+                    # filter optionals in a loop
+                    for i in range(len(func_params)):
+                        if func_params[i].is_optional:
+                            is_exposed = ((1 << pos) & bitflag) != 0
+                            if is_exposed:
+                                fp.append(func_params[i])
+                            pos += 1
+                        else:
+                            fp.append(func_params[i])
+
+                    # write current permutation
+                    _WriteInstr(fp)
+
+            elif self.optionals_mode == "incremental":
+                # todo
+                # or potentially not needed
+                pass
+            elif self.optionals_mode == "disabled":
+                # todo
+                # or potentially not needed
+                pass
 
     def WriteInstructionClass(self, classInfo):
         """
@@ -158,7 +237,7 @@ namespace spirv
         if operandList contains wildcard char "*" all operands from the class will be exposed
         """
         allInstructions = self.grammar['instructions']
-        expoedInstructions = set()
+        exposedInstructions = set()
         if 'class' not in classInfo.keys():
             raise ValueError("In the input file with list of classes and instructions to expose, there is an entry without class name.")
 
@@ -167,8 +246,12 @@ namespace spirv
 
         className = classInfo['class']
         operandList = classInfo['operandList']
+        classNameWildcard = className == "*"
+        if not classNameWildcard:
+            self.exposed_classes.add(classInfo['class'])
         skipContainsCheck = "*" in operandList
         exposedAnything = False
+
         if self.verbose:
             print(f"\tBeginning writing class of operands '{className}'")
 
@@ -182,10 +265,16 @@ namespace spirv
                         exposedAnything = True
                         self.out.write(f"// Class '{className}'\n")
                     self.WriteInstruction(instruction)
-                    expoedInstructions.add(instruction['opname'])
+                    exposedInstructions.add(instruction['opname'])
                     self.out.write(("\n"))
+
+            elif classNameWildcard and instruction['class'] not in self.exposed_classes:
+                # expose remaining classes
+                self.WriteInstruction(instruction)
+                self.out.write(("\n"))
+
         if self.verbose:
-            missing = [op for op in operandList if op not in expoedInstructions]
+            missing = [op for op in operandList if op not in exposedInstructions]
             for missingOp in missing:
                 if missingOp != '*':
                     print(f"Not emitting instruction {missingOp} as it is not present in the current grammar file")
@@ -193,6 +282,10 @@ namespace spirv
     def WriteInstructions(self, input: dict):
         if self.verbose:
             print("Beginning writing operands")
+        write_all = False
+        if 'operand' not in input.keys():
+            write_all = True
+        self.exposed_classes = set()
         for classInfo in input.get('operand', []):
             self.WriteInstructionClass(classInfo)
 
