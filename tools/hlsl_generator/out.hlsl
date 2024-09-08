@@ -522,19 +522,13 @@ template<typename T, typename P>
 [[vk::ext_instruction(spv::OpLoad)]]
 enable_if_t<is_spirv_type_v<P>, T> load(P pointer);
 
-template<typename T>
-[[vk::ext_instruction(spv::OpLoad)]]
-T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t memoryAccess);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpLoad)]]
-T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam);
-
 template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpLoad)]]
 T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
 
 template<typename T>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpLoad)]]
 T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer);
 
@@ -554,19 +548,13 @@ template<typename T, typename P>
 [[vk::ext_instruction(spv::OpStore)]]
 enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T object);
 
-template<typename T>
-[[vk::ext_instruction(spv::OpStore)]]
-void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object, [[vk::ext_literal]] uint32_t memoryAccess);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpStore)]]
-void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object, [[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam);
-
 template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpStore)]]
 void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
 
 template<typename T>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpStore)]]
 void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object);
 

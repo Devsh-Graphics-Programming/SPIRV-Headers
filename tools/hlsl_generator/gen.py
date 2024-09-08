@@ -146,7 +146,7 @@ def gen(grammer_path, output_path):
                     processInst(writer, instruction, InstOptions(shape=Shape.PTR_TEMPLATE))
                 case "Memory":
                     processInst(writer, instruction, InstOptions(shape=Shape.PTR_TEMPLATE))
-                    processInst(writer, instruction, InstOptions(shape=Shape.PSB_RT))
+                    processInst(writer, instruction, InstOptions(shape=Shape.BDA))
                 case "Barrier" | "Bit":
                     processInst(writer, instruction, InstOptions())
                 case "Reserved":
@@ -171,7 +171,7 @@ def gen(grammer_path, output_path):
 class Shape(Enum):
     DEFAULT = 0,
     PTR_TEMPLATE = 1, # TODO: this is a DXC Workaround
-    PSB_RT = 2, # PhysicalStorageBuffer Result Type
+    BDA = 2, # PhysicalStorageBuffer Result Type
 
 class InstOptions(NamedTuple):
     shape: Shape = Shape.DEFAULT
@@ -257,9 +257,10 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                             case "'Pointer'":
                                 if options.shape == Shape.PTR_TEMPLATE:
                                     args.append("P " + operand_name)
-                                elif options.shape == Shape.PSB_RT:    
+                                elif options.shape == Shape.BDA:    
                                     if (not "typename T" in templates) and (rt == "T" or op_ty == "T"):
                                         templates = ["typename T"] + templates
+                                    overload_caps.append("PhysicalStorageBufferAddresses")
                                     args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
                                 else:    
                                     if (not "typename T" in templates) and (rt == "T" or op_ty == "T"):
@@ -280,8 +281,9 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                     case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
                     case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
                     case "MemoryAccess":
-                        writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
-                        writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
+                        if options.shape != Shape.BDA:
+                            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
+                            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
                         writeInst(writer, templates + ["uint32_t alignment"], overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
                     case _: return # TODO
 
