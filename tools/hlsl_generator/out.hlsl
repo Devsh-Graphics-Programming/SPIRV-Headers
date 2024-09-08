@@ -561,7 +561,7 @@ void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T objec
 template<typename T>
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldInsert)]]
-T bitFieldInsert(T base, T insert, uint32_t offset, uint32_t count);
+enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> bitFieldInsert(T base, T insert, uint32_t offset, uint32_t count);
 
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldSExtract)]]
@@ -606,11 +606,11 @@ uint64_t bitFieldExtract_Int64(uint64_t base, uint32_t offset, uint32_t count);
 template<typename T>
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitReverse)]]
-T bitReverse(T base);
+enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> bitReverse(T base);
 
 template<typename T>
 [[vk::ext_instruction(spv::OpBitCount)]]
-T bitCount(T base);
+enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> bitCount(T base);
 
 [[vk::ext_instruction(spv::OpControlBarrier)]]
 void controlBarrier(uint32_t executionScope, uint32_t memoryScope,  uint32_t semantics);

@@ -217,6 +217,10 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                 result_types = ["float16_t", "float32_t", "float64_t"]
                 break
 
+    match instruction["class"]:
+        case "Bit": 
+            if len(result_types) == 0: conds.append("(is_signed_v<T> || is_unsigned_v<T>)")
+
     if "operands" in instruction:
         operands = instruction["operands"]
         if operands[0]["kind"] == "IdResultType":
