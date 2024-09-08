@@ -30,24 +30,24 @@ pointer_t<StorageClass, T> copyObject([[vk::ext_reference]] T value);
 
 //! Std 450 Extended set operations
 template<typename SquareMatrix>
-[[vk::ext_instruction(GLSLstd450MatrixInverse)]]
+[[vk::ext_instruction(34, /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
 
 // Add specializations if you need to emit a `ext_capability` (this means that the instruction needs to forward through an `impl::` struct and so on)
 template<typename T, typename U>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpBitcast)]]
-enable_if_t<is_spirv_type_v<T> && is_spirv_type_v<U>, T> bitcast(U);
+enable_if_t<is_pointer_v<T>, T> bitcast(U);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpBitcast)]]
-uint64_t bitcast(pointer_t<spv::StorageClassPhysicalStorageBuffer,T>);
+uint64_t bitcast(pointer_t<spv::StorageClassPhysicalStorageBuffer, T>);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpBitcast)]]
-pointer_t<spv::StorageClassPhysicalStorageBuffer,T> bitcast(uint64_t);
+pointer_t<spv::StorageClassPhysicalStorageBuffer, T> bitcast(uint64_t);
 
 template<class T, class U>
 [[vk::ext_instruction(spv::OpBitcast)]]
@@ -55,7 +55,8 @@ T bitcast(U);
 
 //! Builtins
 namespace builtin
-{[[vk::ext_builtin_output(spv::BuiltInPosition)]]
+{
+[[vk::ext_builtin_output(spv::BuiltInPosition)]]
 static float32_t4 Position;
 [[vk::ext_builtin_input(spv::BuiltInHelperInvocation)]]
 static const bool HelperInvocation;
