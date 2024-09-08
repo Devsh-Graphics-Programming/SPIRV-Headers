@@ -195,6 +195,8 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
     if options.shape == Shape.PTR_TEMPLATE:
         templates.append("typename P")
         conds.append("is_spirv_type_v<P>")
+    elif options.shape == Shape.BDA:
+        caps.append("PhysicalStorageBufferAddresses")
     
     # split upper case words
     matches = [(m.group(1), m.span(1)) for m in re.finditer(r'([A-Z])[A-Z][a-z]', fn_name)]
@@ -242,74 +244,74 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                 case "float16_t": overload_caps.append("Float16")
                 case "float64_t": overload_caps.append("Float64")
 
-            op_ty = "T"
-            if options.op_ty != None:
-                op_ty = options.op_ty
-            elif rt != "void":
-                op_ty = rt
-            
-            if (not "typename T" in templates) and (rt == "T"):
-                templates = ["typename T"] + templates
+            for cap in overload_caps or [None]:
+                final_fn_name = fn_name + "_" + cap if (len(overload_caps) > 1) else fn_name
+                final_templates = templates.copy()
+                
+                if (not "typename T" in final_templates) and (rt == "T"):
+                    final_templates = ["typename T"] + final_templates
 
-            args = []
-            for operand in operands:
-                operand_name = operand["name"].strip("'") if "name" in operand else None
-                operand_name = operand_name[0].lower() + operand_name[1:] if (operand_name != None) else ""
-                match operand["kind"]:
-                    case "IdRef":
-                        match operand["name"]:
-                            case "'Pointer'":
-                                if options.shape == Shape.PTR_TEMPLATE:
-                                    args.append("P " + operand_name)
-                                elif options.shape == Shape.BDA:    
-                                    if (not "typename T" in templates) and (rt == "T" or op_ty == "T"):
-                                        templates = ["typename T"] + templates
-                                    overload_caps.append("PhysicalStorageBufferAddresses")
-                                    args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
-                                else:    
-                                    if (not "typename T" in templates) and (rt == "T" or op_ty == "T"):
-                                        templates = ["typename T"] + templates
-                                    args.append("[[vk::ext_reference]] " + op_ty + " " + operand_name)
-                            case "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'":
-                                if (not "typename T" in templates) and (rt == "T" or op_ty == "T"):
-                                    templates = ["typename T"] + templates
-                                args.append(op_ty + " " + operand_name)
-                            case "'Offset'" | "'Count'" | "'Id'" | "'Index'" | "'Mask'" | "'Delta'":
-                                args.append("uint32_t " + operand_name)
-                            case "'Predicate'": args.append("bool " + operand_name)
-                            case "'ClusterSize'":
-                                if "quantifier" in operand and operand["quantifier"] == "?": continue # TODO: overload
-                                else: return # TODO
-                            case _: return # TODO
-                    case "IdScope": args.append("uint32_t " + operand_name.lower() + "Scope")
-                    case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
-                    case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
-                    case "MemoryAccess":
-                        if options.shape != Shape.BDA:
-                            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
-                            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
-                        writeInst(writer, templates + ["uint32_t alignment"], overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
-                    case _: return # TODO
+                if len(overload_caps) > 0:
+                    if (("Float16" in cap and rt != "float16_t") or
+                        ("Float32" in cap and rt != "float32_t") or
+                        ("Float64" in cap and rt != "float64_t") or
+                        ("Int16" in cap and rt != "int16_t" and rt != "uint16_t") or
+                        ("Int64" in cap and rt != "int64_t" and rt != "uint64_t")): continue
+                    
+                    if "Vector" in cap:
+                        rt = "vector<" + rt + ", N> "
+                        final_templates.append("typename N")
+                
+                op_ty = "T"
+                if options.op_ty != None:
+                    op_ty = options.op_ty
+                elif rt != "void":
+                    op_ty = rt
 
-            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args)
+                args = []
+                for operand in operands:
+                    operand_name = operand["name"].strip("'") if "name" in operand else None
+                    operand_name = operand_name[0].lower() + operand_name[1:] if (operand_name != None) else ""
+                    match operand["kind"]:
+                        case "IdRef":
+                            match operand["name"]:
+                                case "'Pointer'":
+                                    if options.shape == Shape.PTR_TEMPLATE:
+                                        args.append("P " + operand_name)
+                                    elif options.shape == Shape.BDA:    
+                                        if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
+                                            final_templates = ["typename T"] + final_templates
+                                        args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
+                                    else:    
+                                        if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
+                                            final_templates = ["typename T"] + final_templates
+                                        args.append("[[vk::ext_reference]] " + op_ty + " " + operand_name)
+                                case "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'":
+                                    if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
+                                        final_templates = ["typename T"] + final_templates
+                                    args.append(op_ty + " " + operand_name)
+                                case "'Offset'" | "'Count'" | "'Id'" | "'Index'" | "'Mask'" | "'Delta'":
+                                    args.append("uint32_t " + operand_name)
+                                case "'Predicate'": args.append("bool " + operand_name)
+                                case "'ClusterSize'":
+                                    if "quantifier" in operand and operand["quantifier"] == "?": continue # TODO: overload
+                                    else: return # TODO
+                                case _: return # TODO
+                        case "IdScope": args.append("uint32_t " + operand_name.lower() + "Scope")
+                        case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
+                        case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
+                        case "MemoryAccess":
+                            assert len(overload_caps) <= 1
+                            if options.shape != Shape.BDA:
+                                writeInst(writer, final_templates, cap, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
+                                writeInst(writer, final_templates, cap, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
+                            writeInst(writer, final_templates + ["uint32_t alignment"], cap, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
+                        case _: return # TODO
+
+                writeInst(writer, final_templates, cap, op_name, final_fn_name, conds, rt, args)
 
 
-def writeInst(writer: io.TextIOWrapper, templates, caps, op_name, fn_name, conds, result_type, args):
-    if len(caps) > 0: 
-        for cap in caps:
-            if (("Float16" in cap and result_type != "float16_t") or
-                ("Float32" in cap and result_type != "float32_t") or
-                ("Float64" in cap and result_type != "float64_t") or
-                ("Int16" in cap and result_type != "int16_t" and result_type != "uint16_t") or
-                ("Int64" in cap and result_type != "int64_t" and result_type != "uint64_t")): continue
-            
-            final_fn_name = fn_name
-            if (len(caps) > 1): final_fn_name = fn_name + "_" + cap
-            writeInstInner(writer, templates, cap, op_name, final_fn_name, conds, result_type, args)
-    else:
-        writeInstInner(writer, templates, None, op_name, fn_name, conds, result_type, args)
-
-def writeInstInner(writer: io.TextIOWrapper, templates, cap, op_name, fn_name, conds, result_type, args):
+def writeInst(writer: io.TextIOWrapper, templates, cap, op_name, fn_name, conds, result_type, args):
     if len(templates) > 0:
         writer.write("template<" + ", ".join(templates) + ">\n")
     if (cap != None):
