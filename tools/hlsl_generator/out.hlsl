@@ -1365,8 +1365,39 @@ T groupNonUniformQuadAnyKHR(bool predicate);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_extension("SPV_NV_shader_subgroup_partitioned")]]
 [[vk::ext_instruction(spv::OpGroupNonUniformPartitionNV)]]
 T groupNonUniformPartitionNV(T value);
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderSampleInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpBeginInvocationInterlockEXT)]]
+void beginInvocationInterlockEXT_FragmentShaderSampleInterlockEXT();
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderPixelInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpBeginInvocationInterlockEXT)]]
+void beginInvocationInterlockEXT_FragmentShaderPixelInterlockEXT();
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderShadingRateInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpBeginInvocationInterlockEXT)]]
+void beginInvocationInterlockEXT_FragmentShaderShadingRateInterlockEXT();
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderSampleInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpEndInvocationInterlockEXT)]]
+void endInvocationInterlockEXT_FragmentShaderSampleInterlockEXT();
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderPixelInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpEndInvocationInterlockEXT)]]
+void endInvocationInterlockEXT_FragmentShaderPixelInterlockEXT();
+
+[[vk::ext_capability(spv::CapabilityFragmentShaderShadingRateInterlockEXT)]]
+[[vk::ext_extension("SPV_EXT_fragment_shader_interlock")]]
+[[vk::ext_instruction(spv::OpEndInvocationInterlockEXT)]]
+void endInvocationInterlockEXT_FragmentShaderShadingRateInterlockEXT();
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
@@ -1461,48 +1492,58 @@ template<typename P>
 enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 float16_t atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 vector<float16_t, N>  atomicAddEXT_AtomicFloat16VectorNV([[vk::ext_reference]] vector<float16_t, N>  pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 float32_t atomicAddEXT_AtomicFloat32AddEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 float64_t atomicAddEXT_AtomicFloat64AddEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 [[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 float64_t atomicAddEXT_Float64([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P, typename N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, vector<float16_t, N> > atomicAddEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float32_t> atomicAddEXT_AtomicFloat32AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_AtomicFloat64AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
