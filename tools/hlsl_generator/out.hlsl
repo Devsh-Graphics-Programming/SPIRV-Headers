@@ -482,56 +482,6 @@ namespace execution_mode
 		vk::ext_execution_mode(spv::ExecutionModeShadingRateInterlockUnorderedEXT);
 	}
 
-	void sharedLocalMemorySizeINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeSharedLocalMemorySizeINTEL);
-	}
-
-	void roundingModeRTPINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeRoundingModeRTPINTEL);
-	}
-
-	void roundingModeRTNINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeRoundingModeRTNINTEL);
-	}
-
-	void floatingPointModeALTINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeFloatingPointModeALTINTEL);
-	}
-
-	void floatingPointModeIEEEINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeFloatingPointModeIEEEINTEL);
-	}
-
-	void maxWorkgroupSizeINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeMaxWorkgroupSizeINTEL);
-	}
-
-	void maxWorkDimINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeMaxWorkDimINTEL);
-	}
-
-	void noGlobalOffsetINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeNoGlobalOffsetINTEL);
-	}
-
-	void numSIMDWorkitemsINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeNumSIMDWorkitemsINTEL);
-	}
-
-	void schedulerTargetFmaxMhzINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeSchedulerTargetFmaxMhzINTEL);
-	}
-
 	void maximallyReconvergesKHR()
 	{
 		vk::ext_execution_mode(spv::ExecutionModeMaximallyReconvergesKHR);
@@ -540,36 +490,6 @@ namespace execution_mode
 	void fPFastMathDefault()
 	{
 		vk::ext_execution_mode(spv::ExecutionModeFPFastMathDefault);
-	}
-
-	void streamingInterfaceINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeStreamingInterfaceINTEL);
-	}
-
-	void registerMapInterfaceINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeRegisterMapInterfaceINTEL);
-	}
-
-	void namedBarrierCountINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeNamedBarrierCountINTEL);
-	}
-
-	void maximumRegistersINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeMaximumRegistersINTEL);
-	}
-
-	void maximumRegistersIdINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeMaximumRegistersIdINTEL);
-	}
-
-	void namedMaximumRegistersINTEL()
-	{
-		vk::ext_execution_mode(spv::ExecutionModeNamedMaximumRegistersINTEL);
 	}
 }
 
@@ -1621,14 +1541,6 @@ template<typename P>
 [[vk::ext_capability(spv::CapabilityFloat64)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
-
-[[vk::ext_capability(spv::CapabilitySplitBarrierINTEL)]]
-[[vk::ext_instruction(spv::OpControlBarrierArriveINTEL)]]
-void controlBarrierArriveINTEL(uint32_t executionScope, uint32_t memoryScope,  uint32_t semantics);
-
-[[vk::ext_capability(spv::CapabilitySplitBarrierINTEL)]]
-[[vk::ext_instruction(spv::OpControlBarrierWaitINTEL)]]
-void controlBarrierWaitINTEL(uint32_t executionScope, uint32_t memoryScope,  uint32_t semantics);
 
 }
 

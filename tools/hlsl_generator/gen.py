@@ -124,6 +124,7 @@ def gen(grammer_path, output_path):
         writer.write("\n//! Execution Modes\nnamespace execution_mode\n{")
         for em in execution_modes:
             name = em["enumerant"]
+            if name.endswith("INTEL"): continue
             name_l = name[0].lower() + name[1:]
             writer.write("\n\tvoid " + name_l + "()\n\t{\n\t\tvk::ext_execution_mode(spv::ExecutionMode" + name + ");\n\t}\n")
         writer.write("}\n")
@@ -137,6 +138,8 @@ def gen(grammer_path, output_path):
 
         writer.write("\n//! Instructions\n")
         for instruction in grammer["instructions"]:
+            if instruction["opname"].endswith("INTEL"): continue
+
             match instruction["class"]:
                 case "Atomic":
                     processInst(writer, instruction, InstOptions())
