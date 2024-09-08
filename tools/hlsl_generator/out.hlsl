@@ -650,14 +650,6 @@ template<typename T>
 [[vk::ext_instruction(spv::OpStore)]]
 void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object);
 
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpGenericPtrMemSemantics)]]
-enable_if_t<is_spirv_type_v<P>, T> genericPtrMemSemantics(P pointer);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpGenericPtrMemSemantics)]]
-T genericPtrMemSemantics(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer);
-
 template<typename T>
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldInsert)]]
@@ -725,14 +717,6 @@ T atomicCompareExchange([[vk::ext_reference]] T pointer, uint32_t memoryScope,  
 template<typename T, typename P>
 [[vk::ext_instruction(spv::OpAtomicCompareExchange)]]
 enable_if_t<is_spirv_type_v<P>, T> atomicCompareExchange(P pointer, uint32_t memoryScope,  uint32_t equal,  uint32_t unequal, T value, T comparator);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpAtomicCompareExchangeWeak)]]
-T atomicCompareExchangeWeak([[vk::ext_reference]] T pointer, uint32_t memoryScope,  uint32_t equal,  uint32_t unequal, T value, T comparator);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicCompareExchangeWeak)]]
-enable_if_t<is_spirv_type_v<P>, T> atomicCompareExchangeWeak(P pointer, uint32_t memoryScope,  uint32_t equal,  uint32_t unequal, T value, T comparator);
 
 template<typename T>
 [[vk::ext_instruction(spv::OpAtomicIIncrement)]]
@@ -845,22 +829,6 @@ T atomicXor([[vk::ext_reference]] T pointer, uint32_t memoryScope,  uint32_t sem
 template<typename T, typename P>
 [[vk::ext_instruction(spv::OpAtomicXor)]]
 enable_if_t<is_spirv_type_v<P>, T> atomicXor(P pointer, uint32_t memoryScope,  uint32_t semantics, T value);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpAtomicFlagTestAndSet)]]
-T atomicFlagTestAndSet([[vk::ext_reference]] T pointer, uint32_t memoryScope,  uint32_t semantics);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpAtomicFlagTestAndSet)]]
-enable_if_t<is_spirv_type_v<P>, T> atomicFlagTestAndSet(P pointer, uint32_t memoryScope,  uint32_t semantics);
-
-template<typename T>
-[[vk::ext_instruction(spv::OpAtomicFlagClear)]]
-void atomicFlagClear([[vk::ext_reference]] T pointer, uint32_t memoryScope,  uint32_t semantics);
-
-template<typename P>
-[[vk::ext_instruction(spv::OpAtomicFlagClear)]]
-enable_if_t<is_spirv_type_v<P>, void> atomicFlagClear(P pointer, uint32_t memoryScope,  uint32_t semantics);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniform)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformElect)]]

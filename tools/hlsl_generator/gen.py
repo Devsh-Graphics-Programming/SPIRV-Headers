@@ -185,7 +185,8 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
 
     if "capabilities" in instruction and len(instruction["capabilities"]) > 0:
         for cap in instruction["capabilities"]:
-            if cap == "Shader" or cap == "Kernel": continue
+            if cap == "Kernel" and len(instruction["capabilities"]) == 1: return
+            if cap == "Shader": continue
             caps.append(cap)
     
     if options.shape == Shape.PTR_TEMPLATE:
