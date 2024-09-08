@@ -288,6 +288,12 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
 def writeInst(writer: io.TextIOWrapper, templates, caps, op_name, fn_name, conds, result_type, args):
     if len(caps) > 0: 
         for cap in caps:
+            if (("Float16" in cap and result_type != "float16_t") or
+                ("Float32" in cap and result_type != "float32_t") or
+                ("Float64" in cap and result_type != "float64_t") or
+                ("Int16" in cap and result_type != "int16_t" and result_type != "uint16_t") or
+                ("Int64" in cap and result_type != "int64_t" and result_type != "uint64_t")): continue
+            
             final_fn_name = fn_name
             if (len(caps) > 1): final_fn_name = fn_name + "_" + cap
             writeInstInner(writer, templates, cap, op_name, final_fn_name, conds, result_type, args)
