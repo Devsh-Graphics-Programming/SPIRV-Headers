@@ -60,7 +60,7 @@ pointer_t<spv::StorageClassPhysicalStorageBuffer, T> bitcast(uint64_t);
 
 template<class T, class U>
 [[vk::ext_instruction(spv::OpBitcast)]]
-T bitcast(U);
+enable_if_t<sizeof(T) == sizeof(U) && (is_spirv_type_v<T> || is_vector_v<T>), T> bitcast(U);
 """
 
 foot = """}
