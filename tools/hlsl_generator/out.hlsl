@@ -657,11 +657,31 @@ T bitFieldInsert(T base, T insert, uint32_t offset, uint32_t count);
 
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldSExtract)]]
+int16_t bitFieldExtract_BitInstructions(int16_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpBitFieldSExtract)]]
+int16_t bitFieldExtract_Int16(int16_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityBitInstructions)]]
+[[vk::ext_instruction(spv::OpBitFieldSExtract)]]
 int32_t bitFieldExtract(int32_t base, uint32_t offset, uint32_t count);
 
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldSExtract)]]
-int64_t bitFieldExtract(int64_t base, uint32_t offset, uint32_t count);
+int64_t bitFieldExtract_BitInstructions(int64_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpBitFieldSExtract)]]
+int64_t bitFieldExtract_Int64(int64_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityBitInstructions)]]
+[[vk::ext_instruction(spv::OpBitFieldUExtract)]]
+uint16_t bitFieldExtract_BitInstructions(uint16_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpBitFieldUExtract)]]
+uint16_t bitFieldExtract_Int16(uint16_t base, uint32_t offset, uint32_t count);
 
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldUExtract)]]
@@ -669,7 +689,11 @@ uint32_t bitFieldExtract(uint32_t base, uint32_t offset, uint32_t count);
 
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldUExtract)]]
-uint64_t bitFieldExtract(uint64_t base, uint32_t offset, uint32_t count);
+uint64_t bitFieldExtract_BitInstructions(uint64_t base, uint32_t offset, uint32_t count);
+
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpBitFieldUExtract)]]
+uint64_t bitFieldExtract_Int64(uint64_t base, uint32_t offset, uint32_t count);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
@@ -750,59 +774,103 @@ template<typename T, typename P>
 [[vk::ext_instruction(spv::OpAtomicISub)]]
 enable_if_t<is_spirv_type_v<P> && (is_signed_v<T> || is_unsigned_v<T>), T> atomicISub(P pointer, uint32_t memoryScope,  uint32_t semantics, T value);
 
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicSMin)]]
+int16_t atomicMin([[vk::ext_reference]] int16_t pointer, uint32_t memoryScope,  uint32_t semantics, int16_t value);
+
 [[vk::ext_instruction(spv::OpAtomicSMin)]]
 int32_t atomicMin([[vk::ext_reference]] int32_t pointer, uint32_t memoryScope,  uint32_t semantics, int32_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicSMin)]]
 int64_t atomicMin([[vk::ext_reference]] int64_t pointer, uint32_t memoryScope,  uint32_t semantics, int64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicSMin)]]
+enable_if_t<is_spirv_type_v<P>, int16_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, int16_t value);
 
 template<typename P>
 [[vk::ext_instruction(spv::OpAtomicSMin)]]
 enable_if_t<is_spirv_type_v<P>, int32_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, int32_t value);
 
 template<typename P>
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicSMin)]]
 enable_if_t<is_spirv_type_v<P>, int64_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, int64_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicUMin)]]
+uint16_t atomicMin([[vk::ext_reference]] uint16_t pointer, uint32_t memoryScope,  uint32_t semantics, uint16_t value);
 
 [[vk::ext_instruction(spv::OpAtomicUMin)]]
 uint32_t atomicMin([[vk::ext_reference]] uint32_t pointer, uint32_t memoryScope,  uint32_t semantics, uint32_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicUMin)]]
 uint64_t atomicMin([[vk::ext_reference]] uint64_t pointer, uint32_t memoryScope,  uint32_t semantics, uint64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicUMin)]]
+enable_if_t<is_spirv_type_v<P>, uint16_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, uint16_t value);
 
 template<typename P>
 [[vk::ext_instruction(spv::OpAtomicUMin)]]
 enable_if_t<is_spirv_type_v<P>, uint32_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, uint32_t value);
 
 template<typename P>
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicUMin)]]
 enable_if_t<is_spirv_type_v<P>, uint64_t> atomicMin(P pointer, uint32_t memoryScope,  uint32_t semantics, uint64_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicSMax)]]
+int16_t atomicMax([[vk::ext_reference]] int16_t pointer, uint32_t memoryScope,  uint32_t semantics, int16_t value);
 
 [[vk::ext_instruction(spv::OpAtomicSMax)]]
 int32_t atomicMax([[vk::ext_reference]] int32_t pointer, uint32_t memoryScope,  uint32_t semantics, int32_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicSMax)]]
 int64_t atomicMax([[vk::ext_reference]] int64_t pointer, uint32_t memoryScope,  uint32_t semantics, int64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicSMax)]]
+enable_if_t<is_spirv_type_v<P>, int16_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, int16_t value);
 
 template<typename P>
 [[vk::ext_instruction(spv::OpAtomicSMax)]]
 enable_if_t<is_spirv_type_v<P>, int32_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, int32_t value);
 
 template<typename P>
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicSMax)]]
 enable_if_t<is_spirv_type_v<P>, int64_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, int64_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicUMax)]]
+uint16_t atomicMax([[vk::ext_reference]] uint16_t pointer, uint32_t memoryScope,  uint32_t semantics, uint16_t value);
 
 [[vk::ext_instruction(spv::OpAtomicUMax)]]
 uint32_t atomicMax([[vk::ext_reference]] uint32_t pointer, uint32_t memoryScope,  uint32_t semantics, uint32_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicUMax)]]
 uint64_t atomicMax([[vk::ext_reference]] uint64_t pointer, uint32_t memoryScope,  uint32_t semantics, uint64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpAtomicUMax)]]
+enable_if_t<is_spirv_type_v<P>, uint16_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, uint16_t value);
 
 template<typename P>
 [[vk::ext_instruction(spv::OpAtomicUMax)]]
 enable_if_t<is_spirv_type_v<P>, uint32_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, uint32_t value);
 
 template<typename P>
+[[vk::ext_capability(spv::CapabilityInt64)]]
 [[vk::ext_instruction(spv::OpAtomicUMax)]]
 enable_if_t<is_spirv_type_v<P>, uint64_t> atomicMax(P pointer, uint32_t memoryScope,  uint32_t semantics, uint64_t value);
 
@@ -917,15 +985,47 @@ enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> groupNonUniformIAdd_GroupNo
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-float groupNonUniformAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-float groupNonUniformAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-float groupNonUniformAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float16_t groupNonUniformAdd_Float16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float32_t groupNonUniformAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float32_t groupNonUniformAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float32_t groupNonUniformAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float64_t groupNonUniformAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float64_t groupNonUniformAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float64_t groupNonUniformAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
+float64_t groupNonUniformAdd_Float64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
@@ -944,15 +1044,63 @@ enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> groupNonUniformIMul_GroupNo
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-float groupNonUniformMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-float groupNonUniformMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-float groupNonUniformMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float16_t groupNonUniformMul_Float16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float32_t groupNonUniformMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float32_t groupNonUniformMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float32_t groupNonUniformMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float64_t groupNonUniformMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float64_t groupNonUniformMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float64_t groupNonUniformMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
+float64_t groupNonUniformMul_Float64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
+int16_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
+int16_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
+int16_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
+int16_t groupNonUniformMin_Int16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
@@ -978,6 +1126,26 @@ int64_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[v
 [[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
 int64_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int64_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMin)]]
+int64_t groupNonUniformMin_Int64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
+uint16_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
+uint16_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
+uint16_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
+uint16_t groupNonUniformMin_Int16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
 uint32_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint32_t value);
@@ -1002,17 +1170,69 @@ uint64_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[
 [[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
 uint64_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint64_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMin)]]
+uint64_t groupNonUniformMin_Int64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint64_t value);
+
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-float groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-float groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-float groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float16_t groupNonUniformMin_Float16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float32_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float32_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float32_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float64_t groupNonUniformMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float64_t groupNonUniformMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float64_t groupNonUniformMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
+float64_t groupNonUniformMin_Float64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
+int16_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
+int16_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
+int16_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
+int16_t groupNonUniformMax_Int16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
@@ -1038,6 +1258,26 @@ int64_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[v
 [[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
 int64_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int64_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformSMax)]]
+int64_t groupNonUniformMax_Int64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, int64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
+uint16_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
+uint16_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
+uint16_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
+[[vk::ext_capability(spv::CapabilityInt16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
+uint16_t groupNonUniformMax_Int16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint16_t value);
+
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
 uint32_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint32_t value);
@@ -1062,17 +1302,53 @@ uint64_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[
 [[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
 uint64_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint64_t value);
 
+[[vk::ext_capability(spv::CapabilityInt64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformUMax)]]
+uint64_t groupNonUniformMax_Int64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, uint64_t value);
+
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-float groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-float groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-float groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float value);
+float16_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float16_t groupNonUniformMax_Float16(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float32_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float32_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float32_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float64_t groupNonUniformMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float64_t groupNonUniformMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float64_t groupNonUniformMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
+float64_t groupNonUniformMax_Float64(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, float64_t value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
@@ -1186,111 +1462,381 @@ T groupNonUniformPartitionNV(T value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-float atomicMinEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicMinEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-float atomicMinEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicMinEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-float atomicMinEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicMinEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-float atomicMinEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicMinEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float16_t atomicMinEXT_Float16([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float32_t atomicMinEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float32_t atomicMinEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float32_t atomicMinEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float32_t atomicMinEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float64_t atomicMinEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float64_t atomicMinEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float64_t atomicMinEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float64_t atomicMinEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+float64_t atomicMinEXT_Float64([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMinEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMinEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMinEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMinEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
-[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-float atomicMaxEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
-
-[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
-[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-float atomicMaxEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
-
-[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
-[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-float atomicMaxEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
-
-[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
-[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-float atomicMaxEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_Float16(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMinEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMinEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMinEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMinEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMaxEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicMaxEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float16_t atomicMaxEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float16_t atomicMaxEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float16_t atomicMaxEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float16_t atomicMaxEXT_Float16([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float32_t atomicMaxEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float32_t atomicMaxEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float32_t atomicMaxEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float32_t atomicMaxEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float64_t atomicMaxEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float64_t atomicMaxEXT_AtomicFloat32MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float64_t atomicMaxEXT_AtomicFloat64MinMaxEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float64_t atomicMaxEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+float64_t atomicMaxEXT_Float64([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMaxEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMaxEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicMaxEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_Float16(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMaxEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMaxEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMaxEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicMaxEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_AtomicFloat32MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64MinMaxEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_AtomicFloat64MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-float atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-float atomicAddEXT_AtomicFloat32AddEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicAddEXT_AtomicFloat32AddEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-float atomicAddEXT_AtomicFloat64AddEXT([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicAddEXT_AtomicFloat64AddEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-float atomicAddEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+float16_t atomicAddEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float16_t atomicAddEXT_Float16([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float32_t atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float32_t atomicAddEXT_AtomicFloat32AddEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float32_t atomicAddEXT_AtomicFloat64AddEXT([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float32_t atomicAddEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float32_t pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float64_t atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float64_t atomicAddEXT_AtomicFloat32AddEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float64_t atomicAddEXT_AtomicFloat64AddEXT([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float64_t atomicAddEXT_AtomicFloat16VectorNV([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+float64_t atomicAddEXT_Float64([[vk::ext_reference]] float64_t pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicAddEXT_AtomicFloat32AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat32AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicAddEXT_AtomicFloat64AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat64AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
 template<typename P>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
-enable_if_t<is_spirv_type_v<P>, float> atomicAddEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float value);
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat16)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_Float16(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicAddEXT_AtomicFloat32AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicAddEXT_AtomicFloat64AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float32_t> atomicAddEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float32_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat32AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_AtomicFloat32AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat64AddEXT)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_AtomicFloat64AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
+
+template<typename P>
+[[vk::ext_capability(spv::CapabilityFloat64)]]
+[[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
+enable_if_t<is_spirv_type_v<P>, float64_t> atomicAddEXT_Float64(P pointer, uint32_t memoryScope,  uint32_t semantics, float64_t value);
 
 [[vk::ext_capability(spv::CapabilitySplitBarrierINTEL)]]
 [[vk::ext_instruction(spv::OpControlBarrierArriveINTEL)]]

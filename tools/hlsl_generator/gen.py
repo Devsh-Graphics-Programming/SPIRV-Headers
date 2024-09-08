@@ -203,15 +203,15 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                 break
             case "U":
                 fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["uint32_t", "uint64_t"]
+                result_types = ["uint16_t", "uint32_t", "uint64_t"]
                 break
             case "S":
                 fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["int32_t", "int64_t"]
+                result_types = ["int16_t", "int32_t", "int64_t"]
                 break
             case "F":
                 fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["float"]
+                result_types = ["float16_t", "float32_t", "float64_t"]
                 break
 
     if "operands" in instruction:
@@ -228,6 +228,13 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
             result_types = ["void"]
 
         for rt in result_types:
+            overload_caps = caps.copy()
+            match rt:
+                case "uint16_t" | "int16_t": overload_caps.append("Int16")
+                case "uint64_t" | "int64_t": overload_caps.append("Int64")
+                case "float16_t": overload_caps.append("Float16")
+                case "float64_t": overload_caps.append("Float64")
+
             op_ty = "T"
             if options.op_ty != None:
                 op_ty = options.op_ty
@@ -270,12 +277,12 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                     case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
                     case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
                     case "MemoryAccess":
-                        writeInst(writer, templates, caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
-                        writeInst(writer, templates, caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
-                        writeInst(writer, templates + ["uint32_t alignment"], caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
+                        writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
+                        writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
+                        writeInst(writer, templates + ["uint32_t alignment"], overload_caps, op_name, fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
                     case _: return # TODO
 
-            writeInst(writer, templates, caps, op_name, fn_name, conds, rt, args)
+            writeInst(writer, templates, overload_caps, op_name, fn_name, conds, rt, args)
 
 
 def writeInst(writer: io.TextIOWrapper, templates, caps, op_name, fn_name, conds, result_type, args):
