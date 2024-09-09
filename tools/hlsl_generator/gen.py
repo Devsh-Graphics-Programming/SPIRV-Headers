@@ -28,6 +28,25 @@ namespace hlsl
 namespace spirv
 {
 
+//! General Decls
+template<class T>
+NBL_CONSTEXPR_STATIC_INLINE bool is_pointer_v = is_spirv_type<T>::value;
+
+template<uint32_t StorageClass, typename T>
+struct pointer
+{
+   using type = vk::SpirvOpaqueType<spv::OpTypePointer, vk::Literal< vk::integral_constant<uint32_t, StorageClass> >, T>;
+};
+// partial spec for BDA
+template<typename T>
+struct pointer<spv::StorageClassPhysicalStorageBuffer, T>
+{
+   using type = vk::SpirvType<spv::OpTypePointer, sizeof(uint64_t), sizeof(uint64_t), vk::Literal<vk::integral_constant<uint32_t, spv::StorageClassPhysicalStorageBuffer> >, T>;
+};
+
+template<uint32_t StorageClass, typename T>
+using pointer_t = typename pointer<StorageClass, T>::type;
+
 // The holy operation that makes addrof possible
 template<uint32_t StorageClass, typename T>
 [[vk::ext_instruction(spv::OpCopyObject)]]
