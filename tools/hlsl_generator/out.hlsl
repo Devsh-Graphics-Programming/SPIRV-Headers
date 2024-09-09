@@ -19,16 +19,13 @@ namespace hlsl
 namespace spirv
 {
 
-//! General Decls
-template<uint32_t StorageClass, typename T>
-using pointer_t = vk::SpirvOpaqueType<spv::OpTypePointer, vk::Literal< vk::integral_constant<uint32_t, StorageClass> >, T>;
-
 // The holy operation that makes addrof possible
 template<uint32_t StorageClass, typename T>
 [[vk::ext_instruction(spv::OpCopyObject)]]
 pointer_t<StorageClass, T> copyObject([[vk::ext_reference]] T value);
 
-//! Std 450 Extended set operations
+// TODO: Generate extended instructions
+//! Std 450 Extended set instructions
 template<typename SquareMatrix>
 [[vk::ext_instruction(34, /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
@@ -60,38 +57,64 @@ namespace builtin
 static float32_t4 Position;
 [[vk::ext_builtin_input(spv::BuiltInHelperInvocation)]]
 static const bool HelperInvocation;
+
 [[vk::ext_builtin_input(spv::BuiltInNumWorkgroups)]]
 static const uint32_t3 NumWorkgroups;
+
 [[vk::ext_builtin_input(spv::BuiltInWorkgroupId)]]
 static const uint32_t3 WorkgroupId;
+
 [[vk::ext_builtin_input(spv::BuiltInLocalInvocationId)]]
 static const uint32_t3 LocalInvocationId;
+
 [[vk::ext_builtin_input(spv::BuiltInGlobalInvocationId)]]
 static const uint32_t3 GlobalInvocationId;
+
 [[vk::ext_builtin_input(spv::BuiltInLocalInvocationIndex)]]
 static const uint32_t LocalInvocationIndex;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniform)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupSize)]]
 static const uint32_t SubgroupSize;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniform)]]
 [[vk::ext_builtin_input(spv::BuiltInNumSubgroups)]]
 static const uint32_t NumSubgroups;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniform)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupId)]]
 static const uint32_t SubgroupId;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniform)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupLocalInvocationId)]]
 static const uint32_t SubgroupLocalInvocationId;
+
 [[vk::ext_builtin_input(spv::BuiltInVertexIndex)]]
 static const uint32_t VertexIndex;
+
 [[vk::ext_builtin_input(spv::BuiltInInstanceIndex)]]
 static const uint32_t InstanceIndex;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformBallot)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupEqMask)]]
 static const uint32_t4 SubgroupEqMask;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformBallot)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupGeMask)]]
 static const uint32_t4 SubgroupGeMask;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformBallot)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupGtMask)]]
 static const uint32_t4 SubgroupGtMask;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformBallot)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupLeMask)]]
 static const uint32_t4 SubgroupLeMask;
+
+[[vk::ext_capability(spv::CapabilityGroupNonUniformBallot)]]
 [[vk::ext_builtin_input(spv::BuiltInSubgroupLtMask)]]
 static const uint32_t4 SubgroupLtMask;
+
 }
 
 //! Execution Modes

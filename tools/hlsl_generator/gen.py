@@ -28,16 +28,13 @@ namespace hlsl
 namespace spirv
 {
 
-//! General Decls
-template<uint32_t StorageClass, typename T>
-using pointer_t = vk::SpirvOpaqueType<spv::OpTypePointer, vk::Literal< vk::integral_constant<uint32_t, StorageClass> >, T>;
-
 // The holy operation that makes addrof possible
 template<uint32_t StorageClass, typename T>
 [[vk::ext_instruction(spv::OpCopyObject)]]
 pointer_t<StorageClass, T> copyObject([[vk::ext_reference]] T value);
 
-//! Std 450 Extended set operations
+// TODO: Generate extended instructions
+//! Std 450 Extended set instructions
 template<typename SquareMatrix>
 [[vk::ext_instruction(34, /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
@@ -88,37 +85,58 @@ def gen(grammer_path, output_path):
 
         writer.write("\n//! Builtins\nnamespace builtin\n{\n")
         for b in builtins:
-            builtin_type = None
+            b_name = b["enumerant"]
+            b_type = None
+            b_cap = None
             is_output = False
-            builtin_name = b["enumerant"]
-            match builtin_name:
-                case "HelperInvocation": builtin_type = "bool"
-                case "VertexIndex": builtin_type = "uint32_t"
-                case "InstanceIndex": builtin_type = "uint32_t"
-                case "NumWorkgroups": builtin_type = "uint32_t3"
-                case "WorkgroupId": builtin_type = "uint32_t3"
-                case "LocalInvocationId": builtin_type = "uint32_t3"
-                case "GlobalInvocationId": builtin_type = "uint32_t3"
-                case "LocalInvocationIndex": builtin_type = "uint32_t"
-                case "SubgroupEqMask": builtin_type = "uint32_t4"
-                case "SubgroupGeMask": builtin_type = "uint32_t4"
-                case "SubgroupGtMask": builtin_type = "uint32_t4"
-                case "SubgroupLeMask": builtin_type = "uint32_t4"
-                case "SubgroupLtMask": builtin_type = "uint32_t4"
-                case "SubgroupSize": builtin_type = "uint32_t"
-                case "NumSubgroups": builtin_type = "uint32_t"
-                case "SubgroupId": builtin_type = "uint32_t"
-                case "SubgroupLocalInvocationId": builtin_type = "uint32_t"
+            match b_name:
+                case "HelperInvocation": b_type = "bool"
+                case "VertexIndex": b_type = "uint32_t"
+                case "InstanceIndex": b_type = "uint32_t"
+                case "NumWorkgroups": b_type = "uint32_t3"
+                case "WorkgroupId": b_type = "uint32_t3"
+                case "LocalInvocationId": b_type = "uint32_t3"
+                case "GlobalInvocationId": b_type = "uint32_t3"
+                case "LocalInvocationIndex": b_type = "uint32_t"
+                case "SubgroupEqMask": 
+                    b_type = "uint32_t4"
+                    b_cap = "GroupNonUniformBallot"
+                case "SubgroupGeMask": 
+                    b_type = "uint32_t4"
+                    b_cap = "GroupNonUniformBallot"
+                case "SubgroupGtMask": 
+                    b_type = "uint32_t4"
+                    b_cap = "GroupNonUniformBallot"
+                case "SubgroupLeMask": 
+                    b_type = "uint32_t4"
+                    b_cap = "GroupNonUniformBallot"
+                case "SubgroupLtMask": 
+                    b_type = "uint32_t4"
+                    b_cap = "GroupNonUniformBallot"
+                case "SubgroupSize":
+                    b_type = "uint32_t"
+                    b_cap = "GroupNonUniform"
+                case "NumSubgroups": 
+                    b_type = "uint32_t"
+                    b_cap = "GroupNonUniform"
+                case "SubgroupId":
+                    b_type = "uint32_t"
+                    b_cap = "GroupNonUniform"
+                case "SubgroupLocalInvocationId":
+                    b_type = "uint32_t"
+                    b_cap = "GroupNonUniform"
                 case "Position":
-                    builtin_type = "float32_t4"
+                    b_type = "float32_t4"
                     is_output = True
                 case _: continue
+            if b_cap != None:
+                writer.write("[[vk::ext_capability(spv::Capability" + b_cap + ")]]\n")
             if is_output:
-                writer.write("[[vk::ext_builtin_output(spv::BuiltIn" + builtin_name + ")]]\n")
-                writer.write("static " + builtin_type + " " + builtin_name + ";\n")
+                writer.write("[[vk::ext_builtin_output(spv::BuiltIn" + b_name + ")]]\n")
+                writer.write("static " + b_type + " " + b_name + ";\n")
             else:
-                writer.write("[[vk::ext_builtin_input(spv::BuiltIn" + builtin_name + ")]]\n")
-                writer.write("static const " + builtin_type + " " + builtin_name + ";\n")
+                writer.write("[[vk::ext_builtin_input(spv::BuiltIn" + b_name + ")]]\n")
+                writer.write("static const " + b_type + " " + b_name + ";\n\n")
         writer.write("}\n")
 
         writer.write("\n//! Execution Modes\nnamespace execution_mode\n{")
@@ -142,28 +160,28 @@ def gen(grammer_path, output_path):
 
             match instruction["class"]:
                 case "Atomic":
-                    processInst(writer, instruction, InstOptions())
-                    processInst(writer, instruction, InstOptions(shape=Shape.PTR_TEMPLATE))
+                    processInst(writer, instruction)
+                    processInst(writer, instruction, Shape.PTR_TEMPLATE)
                 case "Memory":
-                    processInst(writer, instruction, InstOptions(shape=Shape.PTR_TEMPLATE))
-                    processInst(writer, instruction, InstOptions(shape=Shape.BDA))
+                    processInst(writer, instruction, Shape.PTR_TEMPLATE)
+                    processInst(writer, instruction, Shape.BDA)
                 case "Barrier" | "Bit":
-                    processInst(writer, instruction, InstOptions())
+                    processInst(writer, instruction)
                 case "Reserved":
                     match instruction["opname"]:
                         case "OpBeginInvocationInterlockEXT" | "OpEndInvocationInterlockEXT":
-                            processInst(writer, instruction, InstOptions())
+                            processInst(writer, instruction)
                 case "Non-Uniform":
                     match instruction["opname"]:
                         case "OpGroupNonUniformElect" | "OpGroupNonUniformAll" | "OpGroupNonUniformAny" | "OpGroupNonUniformAllEqual":
-                            processInst(writer, instruction, InstOptions(result_ty="bool"))
+                            processInst(writer, instruction, result_ty="bool")
                         case "OpGroupNonUniformBallot":
-                            processInst(writer, instruction, InstOptions(result_ty="uint32_t4",op_ty="bool"))
+                            processInst(writer, instruction, result_ty="uint32_t4",prefered_op_ty="bool")
                         case "OpGroupNonUniformInverseBallot" | "OpGroupNonUniformBallotBitExtract":
-                            processInst(writer, instruction, InstOptions(result_ty="bool",op_ty="uint32_t4"))
+                            processInst(writer, instruction, result_ty="bool",prefered_op_ty="uint32_t4")
                         case "OpGroupNonUniformBallotBitCount" | "OpGroupNonUniformBallotFindLSB" | "OpGroupNonUniformBallotFindMSB":
-                            processInst(writer, instruction, InstOptions(result_ty="uint32_t",op_ty="uint32_t4"))
-                        case _: processInst(writer, instruction, InstOptions())
+                            processInst(writer, instruction, result_ty="uint32_t",prefered_op_ty="uint32_t4")
+                        case _: processInst(writer, instruction)
                 case _: continue # TODO
 
         writer.write(foot)
@@ -173,12 +191,11 @@ class Shape(Enum):
     PTR_TEMPLATE = 1, # TODO: this is a DXC Workaround
     BDA = 2, # PhysicalStorageBuffer Result Type
 
-class InstOptions(NamedTuple):
-    shape: Shape = Shape.DEFAULT
-    result_ty: Optional[str] = None
-    op_ty: Optional[str] = None
-
-def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
+def processInst(writer: io.TextIOWrapper,
+                instruction,
+                shape: Shape = Shape.DEFAULT,
+                result_ty: Optional[str] = None,
+                prefered_op_ty: Optional[str] = None):
     templates = []
     caps = []
     conds = []
@@ -193,10 +210,10 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
             if cap == "Shader": continue
             caps.append(cap)
     
-    if options.shape == Shape.PTR_TEMPLATE:
+    if shape == Shape.PTR_TEMPLATE:
         templates.append("typename P")
         conds.append("is_spirv_type_v<P>")
-    elif options.shape == Shape.BDA:
+    elif shape == Shape.BDA:
         caps.append("PhysicalStorageBufferAddresses")
     
     # split upper case words
@@ -226,10 +243,10 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
 
     if "operands" in instruction and instruction["operands"][0]["kind"] == "IdResultType":
         if len(result_types) == 0:
-            if options.result_ty == None:
+            if result_ty == None:
                 result_types = ["T"]
             else:
-                result_types = [options.result_ty]
+                result_types = [result_ty]
     else:
         assert len(result_types) == 0
         result_types = ["void"]
@@ -261,8 +278,8 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                     final_templates.append("typename N")
             
             op_ty = "T"
-            if options.op_ty != None:
-                op_ty = options.op_ty
+            if prefered_op_ty != None:
+                op_ty = prefered_op_ty
             elif rt != "void":
                 op_ty = rt
 
@@ -276,9 +293,9 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                         case "IdRef":
                             match operand["name"]:
                                 case "'Pointer'":
-                                    if options.shape == Shape.PTR_TEMPLATE:
+                                    if shape == Shape.PTR_TEMPLATE:
                                         args.append("P " + operand_name)
-                                    elif options.shape == Shape.BDA:    
+                                    elif shape == Shape.BDA:    
                                         if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
                                             final_templates = ["typename T"] + final_templates
                                         args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
@@ -302,7 +319,7 @@ def processInst(writer: io.TextIOWrapper, instruction, options: InstOptions):
                         case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
                         case "MemoryAccess":
                             assert len(overload_caps) <= 1
-                            if options.shape != Shape.BDA:
+                            if shape != Shape.BDA:
                                 writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
                                 writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
                             writeInst(writer, final_templates + ["uint32_t alignment"], cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
@@ -326,7 +343,7 @@ def writeInst(writer: io.TextIOWrapper, templates, cap, exts, op_name, fn_name, 
     writer.write(" " + fn_name + "(" + ", ".join(args) + ");\n\n")
 
 def ignore(op_name):
-    print("\033[93mWARNING\033[0m: instruction " + op_name + " ignored")
+    print("\033[94mIGNORED\033[0m: " + op_name)
 
 if __name__ == "__main__":
     script_dir_path = os.path.abspath(os.path.dirname(__file__))
