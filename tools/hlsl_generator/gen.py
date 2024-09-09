@@ -220,7 +220,6 @@ def processInst(writer: io.TextIOWrapper,
     conds = []
     op_name = instruction["opname"]
     fn_name = op_name[2].lower() + op_name[3:]
-    result_types = []
     exts = instruction["extensions"] if "extensions" in instruction else []
 
     if "capabilities" in instruction and len(instruction["capabilities"]) > 0:
@@ -244,107 +243,97 @@ def processInst(writer: io.TextIOWrapper,
                 conds.append("(is_signed_v<T> || is_unsigned_v<T>)")
                 break
             case "U":
-                fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["uint16_t", "uint32_t", "uint64_t"]
+                conds.append("is_unsigned_v<T>")
                 break
             case "S":
-                fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["int16_t", "int32_t", "int64_t"]
+                conds.append("is_signed_v<T>")
                 break
             case "F":
-                fn_name = fn_name[0:m[1][0]] + fn_name[m[1][1]:]
-                result_types = ["float16_t", "float32_t", "float64_t"]
+                conds.append("is_floating_point<T>")
                 break
-
-    match instruction["class"]:
-        case "Bit": 
-            if len(result_types) == 0: conds.append("(is_signed_v<T> || is_unsigned_v<T>)")
+    else:
+        if instruction["class"] == "Bit":
+            conds.append("(is_signed_v<T> || is_unsigned_v<T>)")
 
     if "operands" in instruction and instruction["operands"][0]["kind"] == "IdResultType":
-        if len(result_types) == 0:
-            if result_ty == None:
-                result_types = ["T"]
-            else:
-                result_types = [result_ty]
+        if result_ty == None:
+            result_ty = "T"
     else:
-        assert len(result_types) == 0
-        result_types = ["void"]
+        result_ty = "void"
 
-    for rt in result_types:
-        overload_caps = caps.copy()
-        match rt:
-            case "uint16_t" | "int16_t": overload_caps.append("Int16")
-            case "uint64_t" | "int64_t": overload_caps.append("Int64")
-            case "float16_t": overload_caps.append("Float16")
-            case "float64_t": overload_caps.append("Float64")
+    match result_ty:
+        case "uint16_t" | "int16_t": caps.append("Int16")
+        case "uint64_t" | "int64_t": caps.append("Int64")
+        case "float16_t": caps.append("Float16")
+        case "float64_t": caps.append("Float64")
 
-        for cap in overload_caps or [None]:
-            final_fn_name = fn_name + "_" + cap if (len(overload_caps) > 1) else fn_name
-            final_templates = templates.copy()
+    for cap in caps or [None]:
+        final_fn_name = fn_name + "_" + cap if (len(caps) > 1) else fn_name
+        final_templates = templates.copy()
+        
+        if (not "typename T" in final_templates) and (result_ty == "T"):
+            final_templates = ["typename T"] + final_templates
+
+        if len(caps) > 0:
+            if (("Float16" in cap and result_ty != "float16_t") or
+                ("Float32" in cap and result_ty != "float32_t") or
+                ("Float64" in cap and result_ty != "float64_t") or
+                ("Int16" in cap and result_ty != "int16_t" and result_ty != "uint16_t") or
+                ("Int64" in cap and result_ty != "int64_t" and result_ty != "uint64_t")): continue
             
-            if (not "typename T" in final_templates) and (rt == "T"):
-                final_templates = ["typename T"] + final_templates
+            if "Vector" in cap:
+                result_ty = "vector<" + result_ty + ", N> "
+                final_templates.append("uint32_t N")
+        
+        op_ty = "T"
+        if prefered_op_ty != None:
+            op_ty = prefered_op_ty
+        elif result_ty != "void":
+            op_ty = result_ty
 
-            if len(overload_caps) > 0:
-                if (("Float16" in cap and rt != "float16_t") or
-                    ("Float32" in cap and rt != "float32_t") or
-                    ("Float64" in cap and rt != "float64_t") or
-                    ("Int16" in cap and rt != "int16_t" and rt != "uint16_t") or
-                    ("Int64" in cap and rt != "int64_t" and rt != "uint64_t")): continue
-                
-                if "Vector" in cap:
-                    rt = "vector<" + rt + ", N> "
-                    final_templates.append("uint32_t N")
-            
-            op_ty = "T"
-            if prefered_op_ty != None:
-                op_ty = prefered_op_ty
-            elif rt != "void":
-                op_ty = rt
-
-            args = []
-            if "operands" in instruction:
-                for operand in instruction["operands"]:
-                    operand_name = operand["name"].strip("'") if "name" in operand else None
-                    operand_name = operand_name[0].lower() + operand_name[1:] if (operand_name != None) else ""
-                    match operand["kind"]:
-                        case "IdResult" | "IdResultType": continue
-                        case "IdRef":
-                            match operand["name"]:
-                                case "'Pointer'":
-                                    if shape == Shape.PTR_TEMPLATE:
-                                        args.append("P " + operand_name)
-                                    elif shape == Shape.BDA:    
-                                        if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
-                                            final_templates = ["typename T"] + final_templates
-                                        args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
-                                    else:    
-                                        if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
-                                            final_templates = ["typename T"] + final_templates
-                                        args.append("[[vk::ext_reference]] " + op_ty + " " + operand_name)
-                                case "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'":
-                                    if (not "typename T" in final_templates) and (rt == "T" or op_ty == "T"):
+        args = []
+        if "operands" in instruction:
+            for operand in instruction["operands"]:
+                operand_name = operand["name"].strip("'") if "name" in operand else None
+                operand_name = operand_name[0].lower() + operand_name[1:] if (operand_name != None) else ""
+                match operand["kind"]:
+                    case "IdResult" | "IdResultType": continue
+                    case "IdRef":
+                        match operand["name"]:
+                            case "'Pointer'":
+                                if shape == Shape.PTR_TEMPLATE:
+                                    args.append("P " + operand_name)
+                                elif shape == Shape.BDA:    
+                                    if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
                                         final_templates = ["typename T"] + final_templates
-                                    args.append(op_ty + " " + operand_name)
-                                case "'Offset'" | "'Count'" | "'Id'" | "'Index'" | "'Mask'" | "'Delta'":
-                                    args.append("uint32_t " + operand_name)
-                                case "'Predicate'": args.append("bool " + operand_name)
-                                case "'ClusterSize'":
-                                    if "quantifier" in operand and operand["quantifier"] == "?": continue # TODO: overload
-                                    else: return ignore(op_name) # TODO
-                                case _: return ignore(op_name) # TODO
-                        case "IdScope": args.append("uint32_t " + operand_name.lower() + "Scope")
-                        case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
-                        case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
-                        case "MemoryAccess":
-                            assert len(overload_caps) <= 1
-                            if shape != Shape.BDA:
-                                writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
-                                writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
-                            writeInst(writer, final_templates + ["uint32_t alignment"], cap, exts, op_name, final_fn_name, conds, rt, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
-                        case _: return ignore(op_name) # TODO
+                                    args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
+                                else:    
+                                    if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
+                                        final_templates = ["typename T"] + final_templates
+                                    args.append("[[vk::ext_reference]] " + op_ty + " " + operand_name)
+                            case "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'":
+                                if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
+                                    final_templates = ["typename T"] + final_templates
+                                args.append(op_ty + " " + operand_name)
+                            case "'Offset'" | "'Count'" | "'Id'" | "'Index'" | "'Mask'" | "'Delta'":
+                                args.append("uint32_t " + operand_name)
+                            case "'Predicate'": args.append("bool " + operand_name)
+                            case "'ClusterSize'":
+                                if "quantifier" in operand and operand["quantifier"] == "?": continue # TODO: overload
+                                else: return ignore(op_name) # TODO
+                            case _: return ignore(op_name) # TODO
+                    case "IdScope": args.append("uint32_t " + operand_name.lower() + "Scope")
+                    case "IdMemorySemantics": args.append(" uint32_t " + operand_name)
+                    case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
+                    case "MemoryAccess":
+                        assert len(caps) <= 1
+                        if shape != Shape.BDA:
+                            writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
+                            writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
+                        writeInst(writer, final_templates + ["uint32_t alignment"], cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
+                    case _: return ignore(op_name) # TODO
 
-            writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, rt, args)
+        writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args)
 
 
 def writeInst(writer: io.TextIOWrapper, templates, cap, exts, op_name, fn_name, conds, result_type, args):
