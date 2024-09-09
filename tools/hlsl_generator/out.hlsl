@@ -27,7 +27,7 @@ pointer_t<StorageClass, T> copyObject([[vk::ext_reference]] T value);
 // TODO: Generate extended instructions
 //! Std 450 Extended set instructions
 template<typename SquareMatrix>
-[[vk::ext_instruction(34, /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
+[[vk::ext_instruction(34 /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
 
 // Add specializations if you need to emit a `ext_capability` (this means that the instruction needs to forward through an `impl::` struct and so on)
