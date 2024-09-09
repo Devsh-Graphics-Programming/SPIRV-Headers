@@ -1426,7 +1426,7 @@ void endInvocationInterlockEXT_FragmentShaderShadingRateInterlockEXT();
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
 float16_t atomicMinEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename N>
+template<uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
 vector<float16_t, N>  atomicMinEXT_AtomicFloat16VectorNV([[vk::ext_reference]] vector<float16_t, N>  pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
@@ -1448,7 +1448,7 @@ template<typename P>
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
 enable_if_t<is_spirv_type_v<P>, float16_t> atomicMinEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename P, typename N>
+template<typename P, uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMinEXT)]]
 enable_if_t<is_spirv_type_v<P>, vector<float16_t, N> > atomicMinEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
@@ -1472,7 +1472,7 @@ enable_if_t<is_spirv_type_v<P>, float64_t> atomicMinEXT_Float64(P pointer, uint3
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
 float16_t atomicMaxEXT_AtomicFloat16MinMaxEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename N>
+template<uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
 vector<float16_t, N>  atomicMaxEXT_AtomicFloat16VectorNV([[vk::ext_reference]] vector<float16_t, N>  pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
@@ -1494,7 +1494,7 @@ template<typename P>
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
 enable_if_t<is_spirv_type_v<P>, float16_t> atomicMaxEXT_AtomicFloat16MinMaxEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename P, typename N>
+template<typename P, uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_instruction(spv::OpAtomicFMaxEXT)]]
 enable_if_t<is_spirv_type_v<P>, vector<float16_t, N> > atomicMaxEXT_AtomicFloat16VectorNV(P pointer, uint32_t memoryScope,  uint32_t semantics, vector<float16_t, N>  value);
@@ -1519,7 +1519,7 @@ enable_if_t<is_spirv_type_v<P>, float64_t> atomicMaxEXT_Float64(P pointer, uint3
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 float16_t atomicAddEXT_AtomicFloat16AddEXT([[vk::ext_reference]] float16_t pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename N>
+template<uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
@@ -1546,7 +1546,7 @@ template<typename P>
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]
 enable_if_t<is_spirv_type_v<P>, float16_t> atomicAddEXT_AtomicFloat16AddEXT(P pointer, uint32_t memoryScope,  uint32_t semantics, float16_t value);
 
-template<typename P, typename N>
+template<typename P, uint32_t N>
 [[vk::ext_capability(spv::CapabilityAtomicFloat16VectorNV)]]
 [[vk::ext_extension("SPV_EXT_shader_atomic_float_add")]]
 [[vk::ext_instruction(spv::OpAtomicFAddEXT)]]

@@ -275,7 +275,7 @@ def processInst(writer: io.TextIOWrapper,
                 
                 if "Vector" in cap:
                     rt = "vector<" + rt + ", N> "
-                    final_templates.append("typename N")
+                    final_templates.append("uint32_t N")
             
             op_ty = "T"
             if prefered_op_ty != None:
