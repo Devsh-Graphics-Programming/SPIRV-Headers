@@ -20,9 +20,6 @@ namespace spirv
 {
 
 //! General Decls
-template<class T>
-NBL_CONSTEXPR_STATIC_INLINE bool is_pointer_v = is_spirv_type<T>::value;
-
 template<uint32_t StorageClass, typename T>
 struct pointer
 {
@@ -38,6 +35,9 @@ struct pointer<spv::StorageClassPhysicalStorageBuffer, T>
 template<uint32_t StorageClass, typename T>
 using pointer_t = typename pointer<StorageClass, T>::type;
 
+template<uint32_t StorageClass, typename T>
+NBL_CONSTEXPR_STATIC_INLINE bool is_pointer_v = is_same_v<T, typename pointer<StorageClass, T>::type >;
+
 // The holy operation that makes addrof possible
 template<uint32_t StorageClass, typename T>
 [[vk::ext_instruction(spv::OpCopyObject)]]
@@ -49,11 +49,31 @@ template<typename SquareMatrix>
 [[vk::ext_instruction(34 /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
 
+//! Memory instructions
+template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
+[[vk::ext_instruction(spv::OpLoad)]]
+T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
+
+template<typename T, typename P>
+[[vk::ext_instruction(spv::OpLoad)]]
+enable_if_t<is_spirv_type_v<P>, T> load(P pointer);
+
+template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
+[[vk::ext_instruction(spv::OpStore)]]
+void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T>  pointer, T obj, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
+
+template<typename T, typename P>
+[[vk::ext_instruction(spv::OpStore)]]
+enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T obj);
+
+//! Bitcast Instructions
 // Add specializations if you need to emit a `ext_capability` (this means that the instruction needs to forward through an `impl::` struct and so on)
 template<typename T, typename U>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpBitcast)]]
-enable_if_t<is_pointer_v<T>, T> bitcast(U);
+enable_if_t<is_pointer_v<spv::StorageClassPhysicalStorageBuffer, T>, T> bitcast(U);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
@@ -548,58 +568,6 @@ namespace group_operation
 }
 
 //! Instructions
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpLoad)]]
-enable_if_t<is_spirv_type_v<P>, T> load(P pointer, [[vk::ext_literal]] uint32_t memoryAccess);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpLoad)]]
-enable_if_t<is_spirv_type_v<P>, T> load(P pointer, [[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam);
-
-template<typename T, typename P, uint32_t alignment>
-[[vk::ext_instruction(spv::OpLoad)]]
-enable_if_t<is_spirv_type_v<P>, T> load(P pointer, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpLoad)]]
-enable_if_t<is_spirv_type_v<P>, T> load(P pointer);
-
-template<typename T, uint32_t alignment>
-[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
-[[vk::ext_instruction(spv::OpLoad)]]
-T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
-
-template<typename T>
-[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
-[[vk::ext_instruction(spv::OpLoad)]]
-T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpStore)]]
-enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T object, [[vk::ext_literal]] uint32_t memoryAccess);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpStore)]]
-enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T object, [[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam);
-
-template<typename T, typename P, uint32_t alignment>
-[[vk::ext_instruction(spv::OpStore)]]
-enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T object, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
-
-template<typename T, typename P>
-[[vk::ext_instruction(spv::OpStore)]]
-enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T object);
-
-template<typename T, uint32_t alignment>
-[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
-[[vk::ext_instruction(spv::OpStore)]]
-void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
-
-template<typename T>
-[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
-[[vk::ext_instruction(spv::OpStore)]]
-void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, T object);
-
 template<typename T>
 [[vk::ext_capability(spv::CapabilityBitInstructions)]]
 [[vk::ext_instruction(spv::OpBitFieldInsert)]]
@@ -838,17 +806,17 @@ enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> groupNonUniformIAdd_GroupNo
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFAdd_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFAdd_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFAdd)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFAdd_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
@@ -868,17 +836,17 @@ enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> groupNonUniformIMul_GroupNo
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMul_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMul_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMul)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMul_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
@@ -913,17 +881,17 @@ enable_if_t<is_unsigned_v<T>, T> groupNonUniformUMin_GroupNonUniformPartitionedN
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMin_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMin_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMin)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMin_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
@@ -958,17 +926,17 @@ enable_if_t<is_unsigned_v<T>, T> groupNonUniformUMax_GroupNonUniformPartitionedN
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMax_GroupNonUniformArithmetic(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformClustered)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMax_GroupNonUniformClustered(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformPartitionedNV)]]
 [[vk::ext_instruction(spv::OpGroupNonUniformFMax)]]
-enable_if_t<is_floating_point<T>, T> groupNonUniformFMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
+enable_if_t<(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>), T> groupNonUniformFMax_GroupNonUniformPartitionedNV(uint32_t executionScope, [[vk::ext_literal]] uint32_t operation, T value);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityGroupNonUniformArithmetic)]]

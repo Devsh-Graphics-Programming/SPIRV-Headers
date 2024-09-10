@@ -29,9 +29,6 @@ namespace spirv
 {
 
 //! General Decls
-template<class T>
-NBL_CONSTEXPR_STATIC_INLINE bool is_pointer_v = is_spirv_type<T>::value;
-
 template<uint32_t StorageClass, typename T>
 struct pointer
 {
@@ -47,6 +44,9 @@ struct pointer<spv::StorageClassPhysicalStorageBuffer, T>
 template<uint32_t StorageClass, typename T>
 using pointer_t = typename pointer<StorageClass, T>::type;
 
+template<uint32_t StorageClass, typename T>
+NBL_CONSTEXPR_STATIC_INLINE bool is_pointer_v = is_same_v<T, typename pointer<StorageClass, T>::type >;
+
 // The holy operation that makes addrof possible
 template<uint32_t StorageClass, typename T>
 [[vk::ext_instruction(spv::OpCopyObject)]]
@@ -58,11 +58,31 @@ template<typename SquareMatrix>
 [[vk::ext_instruction(34 /* GLSLstd450MatrixInverse */, "GLSL.std.450")]]
 SquareMatrix matrixInverse(NBL_CONST_REF_ARG(SquareMatrix) mat);
 
+//! Memory instructions
+template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
+[[vk::ext_instruction(spv::OpLoad)]]
+T load(pointer_t<spv::StorageClassPhysicalStorageBuffer, T> pointer, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
+
+template<typename T, typename P>
+[[vk::ext_instruction(spv::OpLoad)]]
+enable_if_t<is_spirv_type_v<P>, T> load(P pointer);
+
+template<typename T, uint32_t alignment>
+[[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
+[[vk::ext_instruction(spv::OpStore)]]
+void store(pointer_t<spv::StorageClassPhysicalStorageBuffer, T>  pointer, T obj, [[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002, [[vk::ext_literal]] uint32_t __alignment = alignment);
+
+template<typename T, typename P>
+[[vk::ext_instruction(spv::OpStore)]]
+enable_if_t<is_spirv_type_v<P>, void> store(P pointer, T obj);
+
+//! Bitcast Instructions
 // Add specializations if you need to emit a `ext_capability` (this means that the instruction needs to forward through an `impl::` struct and so on)
 template<typename T, typename U>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
 [[vk::ext_instruction(spv::OpBitcast)]]
-enable_if_t<is_pointer_v<T>, T> bitcast(U);
+enable_if_t<is_pointer_v<spv::StorageClassPhysicalStorageBuffer, T>, T> bitcast(U);
 
 template<typename T>
 [[vk::ext_capability(spv::CapabilityPhysicalStorageBufferAddresses)]]
@@ -181,9 +201,6 @@ def gen(grammer_path, output_path):
                 case "Atomic":
                     processInst(writer, instruction)
                     processInst(writer, instruction, Shape.PTR_TEMPLATE)
-                case "Memory":
-                    processInst(writer, instruction, Shape.PTR_TEMPLATE)
-                    processInst(writer, instruction, Shape.BDA)
                 case "Barrier" | "Bit":
                     processInst(writer, instruction)
                 case "Reserved":
@@ -208,7 +225,6 @@ def gen(grammer_path, output_path):
 class Shape(Enum):
     DEFAULT = 0,
     PTR_TEMPLATE = 1, # TODO: this is a DXC Workaround
-    BDA = 2, # PhysicalStorageBuffer Result Type
 
 def processInst(writer: io.TextIOWrapper,
                 instruction,
@@ -231,8 +247,6 @@ def processInst(writer: io.TextIOWrapper,
     if shape == Shape.PTR_TEMPLATE:
         templates.append("typename P")
         conds.append("is_spirv_type_v<P>")
-    elif shape == Shape.BDA:
-        caps.append("PhysicalStorageBufferAddresses")
     
     # split upper case words
     matches = [(m.group(1), m.span(1)) for m in re.finditer(r'([A-Z])[A-Z][a-z]', fn_name)]
@@ -249,7 +263,7 @@ def processInst(writer: io.TextIOWrapper,
                 conds.append("is_signed_v<T>")
                 break
             case "F":
-                conds.append("is_floating_point<T>")
+                conds.append("(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>)")
                 break
     else:
         if instruction["class"] == "Bit":
@@ -303,10 +317,6 @@ def processInst(writer: io.TextIOWrapper,
                             case "'Pointer'":
                                 if shape == Shape.PTR_TEMPLATE:
                                     args.append("P " + operand_name)
-                                elif shape == Shape.BDA:    
-                                    if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
-                                        final_templates = ["typename T"] + final_templates
-                                    args.append("pointer_t<spv::StorageClassPhysicalStorageBuffer, " + op_ty + "> " + operand_name)
                                 else:    
                                     if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
                                         final_templates = ["typename T"] + final_templates
@@ -327,10 +337,8 @@ def processInst(writer: io.TextIOWrapper,
                     case "GroupOperation": args.append("[[vk::ext_literal]] uint32_t " + operand_name)
                     case "MemoryAccess":
                         assert len(caps) <= 1
-                        if shape != Shape.BDA:
-                            writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
-                            writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
-                        writeInst(writer, final_templates + ["uint32_t alignment"], cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t __aligned = /*Aligned*/0x00000002", "[[vk::ext_literal]] uint32_t __alignment = alignment"])
+                        writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess"])
+                        writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args + ["[[vk::ext_literal]] uint32_t memoryAccess, [[vk::ext_literal]] uint32_t memoryAccessParam"])
                     case _: return ignore(op_name) # TODO
 
         writeInst(writer, final_templates, cap, exts, op_name, final_fn_name, conds, result_ty, args)
