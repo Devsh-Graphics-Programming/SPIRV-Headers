@@ -108,16 +108,12 @@ foot = """}
 #endif
 """
 
-def gen(grammer_path, output_path):
-    grammer_raw = open(grammer_path, "r").read()
-    grammer = json.loads(grammer_raw)
-    del grammer_raw
-            
+def gen(core_grammer, glsl_grammer, output_path):
     output = open(output_path, "w", buffering=1024**2)
 
-    builtins = [x for x in grammer["operand_kinds"] if x["kind"] == "BuiltIn"][0]["enumerants"]
-    execution_modes = [x for x in grammer["operand_kinds"] if x["kind"] == "ExecutionMode"][0]["enumerants"]
-    group_operations = [x for x in grammer["operand_kinds"] if x["kind"] == "GroupOperation"][0]["enumerants"]
+    builtins = [x for x in core_grammer["operand_kinds"] if x["kind"] == "BuiltIn"][0]["enumerants"]
+    execution_modes = [x for x in core_grammer["operand_kinds"] if x["kind"] == "ExecutionMode"][0]["enumerants"]
+    group_operations = [x for x in core_grammer["operand_kinds"] if x["kind"] == "GroupOperation"][0]["enumerants"]
 
     with output as writer:
         writer.write(head)
@@ -194,7 +190,7 @@ def gen(grammer_path, output_path):
         writer.write("}\n")
 
         writer.write("\n//! Instructions\n")
-        for instruction in grammer["instructions"]:
+        for instruction in core_grammer["instructions"]:
             if instruction["opname"].endswith("INTEL"): continue
 
             match instruction["class"]:
@@ -219,6 +215,9 @@ def gen(grammer_path, output_path):
                             processInst(writer, instruction, result_ty="uint32_t",prefered_op_ty="uint32_t4")
                         case _: processInst(writer, instruction)
                 case _: continue # TODO
+        for instruction in glsl_grammer["instructions"]:
+            instruction["operands"] = [{"kind": "IdResultType"}] + instruction["operands"]
+            processInst(writer, instruction)
 
         writer.write(foot)
 
@@ -266,7 +265,7 @@ def processInst(writer: io.TextIOWrapper,
                 conds.append("(is_same_v<float16_t, T> || is_same_v<float32_t, T> || is_same_v<float64_t, T>)")
                 break
     else:
-        if instruction["class"] == "Bit":
+        if "class" in instruction and instruction["class"] == "Bit":
             conds.append("(is_signed_v<T> || is_unsigned_v<T>)")
 
     if "operands" in instruction and instruction["operands"][0]["kind"] == "IdResultType":
@@ -321,7 +320,11 @@ def processInst(writer: io.TextIOWrapper,
                                     if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
                                         final_templates = ["typename T"] + final_templates
                                     args.append("[[vk::ext_reference]] " + op_ty + " " + operand_name)
-                            case "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'":
+                            case ("'a'" | "'b'" | "'c'" | "'x'" | "'y'" | "'z'" | "'i'" | "'v'" |
+                                  "'p'" | "'p0'" | "'p1'" | "'exp'" | "'minVal'" | "'maxVal'" | "'y_over_x'" | 
+                                  "'edge'" | "'edge0'" | "'edge1'" | "'I'" | "'N'" | "'eta'" | "'sample'" |
+                                   "'degrees'" | "'radians'" | "'Nref'" | "'interpolant'" | "'offset'" |
+                                  "'Value'" | "'Object'" | "'Comparator'" | "'Base'" | "'Insert'"):
                                 if (not "typename T" in final_templates) and (result_ty == "T" or op_ty == "T"):
                                     final_templates = ["typename T"] + final_templates
                                 args.append(op_ty + " " + operand_name)
@@ -366,8 +369,21 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description="Generate HLSL from SPIR-V instructions")
     parser.add_argument("output", type=str, help="HLSL output file")
-    parser.add_argument("--grammer", required=False, type=str, help="Input SPIR-V grammer JSON file", default=os.path.join(script_dir_path, "../../include/spirv/unified1/spirv.core.grammar.json"))
+    parser.add_argument("--core-grammer", required=False, type=str,
+                         help="SPIR-V Core grammer JSON file",
+                         default=os.path.join(script_dir_path, "../../include/spirv/unified1/spirv.core.grammar.json"))
+    parser.add_argument("--glsl-grammer", required=False, type=str,
+                         help="SPIR-V Extended GLSL.std.450 grammer JSON file",
+                         default=os.path.join(script_dir_path, "../../include/spirv/unified1/extinst.glsl.std.450.grammar.json"))
     args = parser.parse_args()
 
-    gen(args.grammer, args.output)
+    grammer_raw = open(args.core_grammer, "r").read()
+    core_grammer = json.loads(grammer_raw)
+    del grammer_raw
+
+    grammer_raw = open(args.glsl_grammer, "r").read()
+    glsl_grammer = json.loads(grammer_raw)
+    del grammer_raw
+
+    gen(core_grammer, glsl_grammer, args.output)
 

@@ -1079,6 +1079,325 @@ void endInvocationInterlockEXT_FragmentShaderPixelInterlockEXT();
 [[vk::ext_instruction(spv::OpEndInvocationInterlockEXT)]]
 void endInvocationInterlockEXT_FragmentShaderShadingRateInterlockEXT();
 
+template<typename T>
+[[vk::ext_instruction(spv::Round)]]
+T und(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::RoundEven)]]
+T undEven(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Trunc)]]
+T unc(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::FAbs)]]
+T bs(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::SAbs)]]
+T bs(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::FSign)]]
+T ign(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::SSign)]]
+T ign(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Floor)]]
+T oor(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Ceil)]]
+T il(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Fract)]]
+T act(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Radians)]]
+T dians(T degrees);
+
+template<typename T>
+[[vk::ext_instruction(spv::Degrees)]]
+T grees(T radians);
+
+template<typename T>
+[[vk::ext_instruction(spv::Sin)]]
+T n(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Cos)]]
+T s(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Tan)]]
+T n(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Asin)]]
+T in(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Acos)]]
+T os(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Atan)]]
+T an(T y_over_x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Sinh)]]
+T nh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Cosh)]]
+T sh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Tanh)]]
+T nh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Asinh)]]
+T inh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Acosh)]]
+T osh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Atanh)]]
+T anh(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Atan2)]]
+T an2(T y, T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Pow)]]
+T w(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::Exp)]]
+T p(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Log)]]
+T g(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Exp2)]]
+T p2(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Log2)]]
+T g2(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Sqrt)]]
+T rt(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::InverseSqrt)]]
+T verseSqrt(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Determinant)]]
+T terminant(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::MatrixInverse)]]
+T trixInverse(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Modf)]]
+T df(T x, T i);
+
+template<typename T>
+[[vk::ext_instruction(spv::ModfStruct)]]
+T dfStruct(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::FMin)]]
+T in(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::UMin)]]
+T in(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::SMin)]]
+T in(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::FMax)]]
+T ax(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::UMax)]]
+T ax(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::SMax)]]
+T ax(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::FClamp)]]
+T lamp(T x, T minVal, T maxVal);
+
+template<typename T>
+[[vk::ext_instruction(spv::UClamp)]]
+T lamp(T x, T minVal, T maxVal);
+
+template<typename T>
+[[vk::ext_instruction(spv::SClamp)]]
+T lamp(T x, T minVal, T maxVal);
+
+template<typename T>
+[[vk::ext_instruction(spv::FMix)]]
+T ix(T x, T y, T a);
+
+template<typename T>
+[[vk::ext_instruction(spv::IMix)]]
+T ix(T x, T y, T a);
+
+template<typename T>
+[[vk::ext_instruction(spv::Step)]]
+T ep(T edge, T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::SmoothStep)]]
+T oothStep(T edge0, T edge1, T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Fma)]]
+T a(T a, T b, T c);
+
+template<typename T>
+[[vk::ext_instruction(spv::Frexp)]]
+T exp(T x, T exp);
+
+template<typename T>
+[[vk::ext_instruction(spv::FrexpStruct)]]
+T expStruct(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Ldexp)]]
+T exp(T x, T exp);
+
+template<typename T>
+[[vk::ext_instruction(spv::PackSnorm4x8)]]
+T ckSnorm4x8(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::PackUnorm4x8)]]
+T ckUnorm4x8(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::PackSnorm2x16)]]
+T ckSnorm2x16(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::PackUnorm2x16)]]
+T ckUnorm2x16(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::PackHalf2x16)]]
+T ckHalf2x16(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::UnpackSnorm2x16)]]
+T packSnorm2x16(T p);
+
+template<typename T>
+[[vk::ext_instruction(spv::UnpackUnorm2x16)]]
+T packUnorm2x16(T p);
+
+template<typename T>
+[[vk::ext_instruction(spv::UnpackHalf2x16)]]
+T packHalf2x16(T v);
+
+template<typename T>
+[[vk::ext_instruction(spv::UnpackSnorm4x8)]]
+T packSnorm4x8(T p);
+
+template<typename T>
+[[vk::ext_instruction(spv::UnpackUnorm4x8)]]
+T packUnorm4x8(T p);
+
+template<typename T>
+[[vk::ext_instruction(spv::Length)]]
+T ngth(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::Distance)]]
+T stance(T p0, T p1);
+
+template<typename T>
+[[vk::ext_instruction(spv::Cross)]]
+T oss(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::Normalize)]]
+T rmalize(T x);
+
+template<typename T>
+[[vk::ext_instruction(spv::FaceForward)]]
+T ceForward(T n, T i, T nref);
+
+template<typename T>
+[[vk::ext_instruction(spv::Reflect)]]
+T flect(T i, T n);
+
+template<typename T>
+[[vk::ext_instruction(spv::Refract)]]
+T fract(T i, T n, T eta);
+
+template<typename T>
+[[vk::ext_instruction(spv::FindILsb)]]
+enable_if_t<(is_signed_v<T> || is_unsigned_v<T>), T> ndILsb(T value);
+
+template<typename T>
+[[vk::ext_instruction(spv::FindSMsb)]]
+enable_if_t<is_signed_v<T>, T> ndSMsb(T value);
+
+template<typename T>
+[[vk::ext_instruction(spv::FindUMsb)]]
+enable_if_t<is_unsigned_v<T>, T> ndUMsb(T value);
+
+template<typename T>
+[[vk::ext_capability(spv::CapabilityInterpolationFunction)]]
+[[vk::ext_instruction(spv::InterpolateAtCentroid)]]
+T terpolateAtCentroid(T interpolant);
+
+template<typename T>
+[[vk::ext_capability(spv::CapabilityInterpolationFunction)]]
+[[vk::ext_instruction(spv::InterpolateAtSample)]]
+T terpolateAtSample(T interpolant, T sample);
+
+template<typename T>
+[[vk::ext_capability(spv::CapabilityInterpolationFunction)]]
+[[vk::ext_instruction(spv::InterpolateAtOffset)]]
+T terpolateAtOffset(T interpolant, T offset);
+
+template<typename T>
+[[vk::ext_instruction(spv::NMin)]]
+T in(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::NMax)]]
+T ax(T x, T y);
+
+template<typename T>
+[[vk::ext_instruction(spv::NClamp)]]
+T lamp(T x, T minVal, T maxVal);
+
 }
 
 #endif
