@@ -1,0 +1,40 @@
+{
+    "operand": [
+        {
+            "class": "Atomic",
+            "operandList": [
+                "*"
+            ]
+        },
+        {
+            "class": "Conversion",
+            "operandList": [
+                "OpBitcast"
+            ]
+        },
+        {
+            "class": "Non-Uniform",
+            "operandList": [
+                "OpGroupNonUniformFAdd"
+            ]
+        },
+        {
+            "class": "Bit",
+            "operandList": [
+                "OpBitFieldUExtract",
+                "OpBitFieldSExtract"
+            ]
+        }
+    ],
+    "builtins": [
+        "HelperInvocation",
+        "Position",
+        "VertexIndex",
+        "InstanceIndex",
+        "NumWorkgroups",
+        "WorkgroupId",
+        "LocalInvocationId",
+        "GlobalInvocationId",
+        "LocalInvocationIndex"
+    ]
+}
